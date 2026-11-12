@@ -6,6 +6,8 @@ import { preload } from "react-dom";
 import { BackButton } from "@/components/dish/back-button";
 import { DishViewer } from "@/components/dish/dish-viewer";
 import { LanguageSwitch } from "@/components/menu/language-switch";
+import { PoweredBy } from "@/components/menu/powered-by";
+import { Ruler } from "lucide-react";
 import { DishSkeleton } from "@/components/menu/skeletons";
 import { Badge } from "@/components/ui/badge";
 import { getDish, getRestaurant, getRestaurants } from "@/lib/demo-data";
@@ -99,21 +101,28 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
         )}
 
         <p className="mt-3 text-muted-foreground">{dish.description}</p>
-        {dish.portionCm && (
-          <p className="mt-4 text-sm font-medium">
-            {t.dish.portion(
-              formatLength(dish.portionCm.width),
-              formatLength(dish.portionCm.depth),
-              formatLength(dish.portionCm.height),
+        <section aria-label={t.dish.sizeHeading} className="mt-5 flex gap-3 rounded-xl border border-[#0B7A70]/25 bg-[#0B7A70]/5 p-4">
+          <Ruler className="mt-0.5 size-5 shrink-0 text-[#0B7A70]" aria-hidden />
+          <div className="text-sm">
+            <p className="font-semibold text-[#08615A]">{t.dish.sizeHeading}</p>
+            {dish.portionCm && (
+              <p className="mt-1">
+                {t.dish.portion(
+                  formatLength(dish.portionCm.width),
+                  formatLength(dish.portionCm.depth),
+                  formatLength(dish.portionCm.height),
+                )}
+              </p>
             )}
-          </p>
-        )}
-        <p className={dish.portionCm ? "mt-1 text-sm" : "mt-4 text-sm"}>
-          {dish.servedIn
-            ? t.dish.servedIn(dish.servedIn.kind, plateSize, dish.servedIn.oz)
-            : t.dish.servedOn(plateSize)}
-        </p>
+            <p className="mt-1">
+              {dish.servedIn
+                ? t.dish.servedIn(dish.servedIn.kind, plateSize, dish.servedIn.oz)
+                : t.dish.servedOn(plateSize)}
+            </p>
+          </div>
+        </section>
       </article>
+      <PoweredBy label={t.menu.poweredBy} />
     </main>
   );
 }

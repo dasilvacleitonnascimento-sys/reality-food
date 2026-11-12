@@ -5,6 +5,8 @@ import { CategoryTabs } from "@/components/menu/category-tabs";
 import { DishCard } from "@/components/menu/dish-card";
 import { MenuHeader } from "@/components/menu/menu-header";
 import { MenuSkeleton } from "@/components/menu/skeletons";
+import { PoweredBy } from "@/components/menu/powered-by";
+import { formatPlateSize } from "@/lib/format";
 import { getRestaurant, getRestaurants } from "@/lib/demo-data";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -38,7 +40,8 @@ async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] 
   if (!isLocale(lang)) notFound();
   const restaurant = getRestaurant(slug, lang);
   if (!restaurant) notFound();
-  const t = getDictionary(lang).menu;
+  const dict = getDictionary(lang);
+  const t = dict.menu;
 
   return (
     <main
@@ -68,6 +71,7 @@ async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] 
                   // Locale-free link: the proxy keeps the diner's language.
                   href={`/${restaurant.slug}/dish/${dish.id}`}
                   soldOutLabel={t.soldOut}
+                  sizeLabel={dict.dish.sizeShort(dish.servedIn?.kind ?? "plate", formatPlateSize(dish.plateDiameterCm).split(" (")[0], dish.servedIn?.oz)}
                   preloadPhoto={categoryIndex === 0 && dishIndex < 2}
                 />
               ))}
@@ -75,6 +79,7 @@ async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] 
           </section>
         );
       })}
+      <PoweredBy label={t.poweredBy} />
     </main>
   );
 }

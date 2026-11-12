@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Ruler } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -9,10 +10,12 @@ type Props = {
   dish: Dish;
   href: string;
   soldOutLabel: string;
+  /** e.g. "28 cm plate", "16 oz glass" */
+  sizeLabel?: string;
   preloadPhoto?: boolean;
 };
 
-export function DishCard({ dish, href, soldOutLabel, preloadPhoto = false }: Props) {
+export function DishCard({ dish, href, soldOutLabel, sizeLabel, preloadPhoto = false }: Props) {
   const has3d = Boolean(dish.glbUrl);
 
   return (
@@ -28,6 +31,12 @@ export function DishCard({ dish, href, soldOutLabel, preloadPhoto = false }: Pro
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
           {dish.description}
         </p>
+        {sizeLabel && (
+          <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-[#0B7A70]">
+            <Ruler className="size-3.5" aria-hidden />
+            {sizeLabel}
+          </p>
+        )}
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           <span className="mr-1 font-semibold">{formatPrice(dish.price)}</span>
           {!dish.isAvailable && <Badge variant="destructive">{soldOutLabel}</Badge>}

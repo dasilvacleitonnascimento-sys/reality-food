@@ -24,9 +24,11 @@ const en = {
     table: "Table",
     soldOut: "Sold out",
     language: "Language",
+    poweredBy: "Menu by Reality Food",
   },
   dish: {
     back: "Menu",
+    sizeHeading: "True size",
     model3d: (dish: string) => `3D model of ${dish}`,
     servedOn: (size: string) => `Plate size: ${size}`,
     servedIn: (kind: Vessel, size: string, oz?: number) =>
@@ -93,9 +95,11 @@ const es: Dictionary = {
     table: "Mesa",
     soldOut: "Agotado",
     language: "Idioma",
+    poweredBy: "Menú por Reality Food",
   },
   dish: {
     back: "Menú",
+    sizeHeading: "Tamaño real",
     model3d: (dish) => `Modelo 3D de ${dish}`,
     servedOn: (size) => `Tamaño del plato: ${size}`,
     servedIn: (kind, size, oz) =>
