@@ -1,0 +1,80 @@
+import type { Metadata } from "next";
+import { Suspense, type CSSProperties } from "react";
+import { notFound } from "next/navigation";
+import { CategoryTabs } from "@/components/menu/category-tabs";
+import { DishCard } from "@/components/menu/dish-card";
+import { MenuHeader } from "@/components/menu/menu-header";
+import { MenuSkeleton } from "@/components/menu/skeletons";
+import { getRestaurant, getRestaurants } from "@/lib/demo-data";
+import { isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+
+export function generateStaticParams() {
+  return getRestaurants().map((r) => ({ slug: r.slug }));
+}
+
+export async function generateMetadata(props: PageProps<"/[lang]/[slug]">): Promise<Metadata> {
+  const { lang, slug } = await props.params;
+  if (!isLocale(lang)) return {};
+  const restaurant = getRestaurant(slug, lang);
+  if (!restaurant) return {};
+  return {
+    title: getDictionary(lang).menu.title(restaurant.name),
+    description: restaurant.tagline,
+  };
+}
+
+// The page shell renders instantly; the menu streams in (Next 16 instant navigation).
+export default function MenuPage(props: PageProps<"/[lang]/[slug]">) {
+  return (
+    <Suspense fallback={<MenuSkeleton />}>
+      <Menu params={props.params} />
+    </Suspense>
+  );
+}
+
+async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] }) {
+  const { lang, slug } = await params;
+  if (!isLocale(lang)) notFound();
+  const restaurant = getRestaurant(slug, lang);
+  if (!restaurant) notFound();
+  const t = getDictionary(lang).menu;
+
+  return (
+    <main
+      className="mx-auto w-full max-w-xl pb-16"
+      style={{ "--brand": restaurant.primaryColor } as CSSProperties}
+    >
+      <MenuHeader restaurant={restaurant} locale={lang} text={{ table: t.table, language: t.language }} />
+      <CategoryTabs categories={restaurant.categories} label={t.categories} />
+
+      {restaurant.categories.map((category, categoryIndex) => {
+        const dishes = restaurant.dishes.filter((d) => d.category === category.id);
+        return (
+          <section
+            key={category.id}
+            id={category.id}
+            aria-labelledby={`${category.id}-heading`}
+            className="scroll-mt-16 px-4 pt-6"
+          >
+            <h2 id={`${category.id}-heading`} className="text-lg font-semibold tracking-tight">
+              {category.name}
+            </h2>
+            <div className="divide-y">
+              {dishes.map((dish, dishIndex) => (
+                <DishCard
+                  key={dish.id}
+                  dish={dish}
+                  // Locale-free link: the proxy keeps the diner's language.
+                  href={`/${restaurant.slug}/dish/${dish.id}`}
+                  soldOutLabel={t.soldOut}
+                  preloadPhoto={categoryIndex === 0 && dishIndex < 2}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </main>
+  );
+}

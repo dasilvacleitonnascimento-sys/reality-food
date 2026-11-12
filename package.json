@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "demo-assets": "node scripts/generate-demo-assets.mjs"
+    "demo-assets": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-demo-assets.mjs",
+    "check-models": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-models.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -32,6 +33,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.183.1",
+    "draco3dgltf": "^1.5.7",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",

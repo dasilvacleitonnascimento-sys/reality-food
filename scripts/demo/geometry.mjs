@@ -264,29 +264,39 @@ export function disc(radius, opts = {}) {
   );
 }
 
-/** Surface of revolution from a polyline of [radius, y] points (resampled by length). */
+/**
+ * Surface of revolution from a polyline of [radius, y] points.
+ * Every profile point is kept exactly (so a plate's rim is exactly its
+ * stated radius); extra rows are spread over segments by length.
+ */
 export function lathe(profile, opts = {}) {
   const { nu = 96, nv = 64, ...rest } = opts;
-  const lengths = [0];
+  const segs = profile.length - 1;
+  const lens = [];
   for (let i = 1; i < profile.length; i++) {
-    const [r0, y0] = profile[i - 1];
-    const [r1, y1] = profile[i];
-    lengths.push(lengths[i - 1] + Math.hypot(r1 - r0, y1 - y0));
+    lens.push(Math.hypot(profile[i][0] - profile[i - 1][0], profile[i][1] - profile[i - 1][1]));
   }
-  const total = lengths[lengths.length - 1];
-  const sample = (t) => {
-    const d = t * total;
-    let i = 1;
-    while (i < lengths.length - 1 && lengths[i] < d) i++;
-    const f = (d - lengths[i - 1]) / (lengths[i] - lengths[i - 1] || 1);
-    return [lerp(profile[i - 1][0], profile[i][0], f), lerp(profile[i - 1][1], profile[i][1], f)];
-  };
+  const total = lens.reduce((a, b) => a + b, 0);
+  const rows = Math.max(nv, segs);
+  // At least one row per segment, the rest by length (largest remainders).
+  const ideal = lens.map((l) => 1 + ((rows - segs) * l) / total);
+  const counts = ideal.map(Math.floor);
+  let left = rows - counts.reduce((a, b) => a + b, 0);
+  const order = ideal.map((x, i) => [x - Math.floor(x), i]).sort((a, b) => b[0] - a[0]);
+  for (let k = 0; left > 0; k++, left--) counts[order[k % segs][1]]++;
+  const points = [profile[0]];
+  counts.forEach((n, i) => {
+    for (let s = 1; s <= n; s++) {
+      const f = s / n;
+      points.push([lerp(profile[i][0], profile[i + 1][0], f), lerp(profile[i][1], profile[i + 1][1], f)]);
+    }
+  });
   return new Part(
     nu,
-    nv,
+    rows,
     (u, v) => {
       const th = u * TAU;
-      const [r, y] = sample(v);
+      const [r, y] = points[Math.round(v * rows)];
       return [r * Math.cos(th), y, r * Math.sin(th)];
     },
     rest,

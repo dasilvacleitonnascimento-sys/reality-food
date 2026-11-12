@@ -1,0 +1,141 @@
+// UI text for every supported language. Restaurant content (dish names,
+// descriptions) is translated in the restaurant's own data instead.
+
+import type { Locale } from "./config";
+
+const en = {
+  site: {
+    description: "See every dish on your table in 3D before you order.",
+  },
+  home: {
+    tagline: "Let your guests see every dish on their table in 3D before they order.",
+    cta: "Try the live demo",
+  },
+  notFound: {
+    title: "Menu not found",
+    body: "This menu doesn't exist or is no longer available. Please ask your server for help.",
+    home: "Go to homepage",
+  },
+  menu: {
+    title: (restaurant: string) => `${restaurant} menu`,
+    categories: "Menu categories",
+    table: "Table",
+    soldOut: "Sold out",
+    language: "Language",
+  },
+  dish: {
+    back: "Menu",
+    model3d: (dish: string) => `3D model of ${dish}`,
+    servedOn: (size: string) => `Served on a ${size} plate`,
+  },
+  viewer: {
+    viewOnTable: "View on your table",
+    loading3d: "Loading 3D model",
+    loadFailed: "The 3D model could not be loaded. Please check your connection.",
+    arFailed: "AR could not start on this device. You can still rotate the dish above with your finger.",
+    notSupported: "Open this page on your phone to see the dish on your table. Here you can drag to rotate it.",
+    tapHint: "Tap the button, then point your camera at the table.",
+  },
+  ar: {
+    trueSize: (size: string) => `True size · ${size} plate`,
+    close: "Close AR",
+    placeHere: "Place here",
+    moveDish: "Move dish",
+    ruler: "Ruler",
+    hints: {
+      loading: "Loading the dish…",
+      searching: "Point your camera at the table and move your phone slowly.",
+      estimating: "Still looking for the table. Move your phone slowly over it.",
+      following: "The dish follows your camera. Tap Place here to set it down.",
+      placed: "Set down at true size. Walk around it or hold your hand next to it.",
+    },
+  },
+  guide: {
+    title: "See it at true size",
+    body: "Your phone needs a second to find the table.",
+    tips: ["Good light helps", "Aim at a table with some texture", "Move your phone slowly from side to side"],
+    open: "Open camera",
+    cancel: "Not now",
+  },
+};
+
+export type Dictionary = typeof en;
+
+const es: Dictionary = {
+  site: {
+    description: "Mira cada plato en tu mesa en 3D antes de pedir.",
+  },
+  home: {
+    tagline: "Deja que tus clientes vean cada plato en su mesa en 3D antes de pedir.",
+    cta: "Prueba la demo en vivo",
+  },
+  notFound: {
+    title: "Menú no encontrado",
+    body: "Este menú no existe o ya no está disponible. Pide ayuda a tu mesero.",
+    home: "Ir al inicio",
+  },
+  menu: {
+    title: (restaurant) => `Menú de ${restaurant}`,
+    categories: "Categorías del menú",
+    table: "Mesa",
+    soldOut: "Agotado",
+    language: "Idioma",
+  },
+  dish: {
+    back: "Menú",
+    model3d: (dish) => `Modelo 3D de ${dish}`,
+    servedOn: (size) => `Se sirve en un plato de ${size}`,
+  },
+  viewer: {
+    viewOnTable: "Ver en tu mesa",
+    loading3d: "Cargando modelo 3D",
+    loadFailed: "No se pudo cargar el modelo 3D. Revisa tu conexión.",
+    arFailed: "La realidad aumentada no pudo iniciar en este dispositivo. Aún puedes girar el plato con el dedo.",
+    notSupported: "Abre esta página en tu teléfono para ver el plato en tu mesa. Aquí puedes arrastrar para girarlo.",
+    tapHint: "Toca el botón y apunta la cámara a la mesa.",
+  },
+  ar: {
+    trueSize: (size) => `Tamaño real · plato de ${size}`,
+    close: "Cerrar",
+    placeHere: "Colocar aquí",
+    moveDish: "Mover plato",
+    ruler: "Regla",
+    hints: {
+      loading: "Cargando el plato…",
+      searching: "Apunta la cámara a la mesa y mueve el teléfono despacio.",
+      estimating: "Seguimos buscando la mesa. Mueve el teléfono despacio sobre ella.",
+      following: "El plato sigue tu cámara. Toca Colocar aquí para dejarlo.",
+      placed: "Colocado en tamaño real. Rodéalo o pon tu mano al lado.",
+    },
+  },
+  guide: {
+    title: "Míralo en tamaño real",
+    body: "Tu teléfono necesita un segundo para encontrar la mesa.",
+    tips: ["Con buena luz funciona mejor", "Apunta a una mesa con algo de textura", "Mueve el teléfono despacio de lado a lado"],
+    open: "Abrir cámara",
+    cancel: "Ahora no",
+  },
+};
+
+const dictionaries: Record<Locale, Dictionary> = { en, es };
+
+export function getDictionary(locale: Locale): Dictionary {
+  return dictionaries[locale];
+}
+
+/** Plain-string parts of the dictionary that client components need (functions can't cross to the client). */
+export function getViewerText(locale: Locale, plateSize: string) {
+  const d = dictionaries[locale];
+  return {
+    ...d.viewer,
+    trueSize: d.ar.trueSize(plateSize),
+    close: d.ar.close,
+    placeHere: d.ar.placeHere,
+    moveDish: d.ar.moveDish,
+    ruler: d.ar.ruler,
+    hints: d.ar.hints,
+    guide: d.guide,
+  };
+}
+
+export type ViewerText = ReturnType<typeof getViewerText>;

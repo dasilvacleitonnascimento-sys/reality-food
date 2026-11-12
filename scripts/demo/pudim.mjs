@@ -56,7 +56,7 @@ export async function pudim() {
       [cm(13), 0.0095],
       [cm(14.8), 0.015],
       [PR, 0.016],
-      [cm(15.55), 0.0145],
+      [PR, 0.0145],
       [cm(14.8), 0.0135],
       [cm(13), 0.008],
       [cm(11.8), 0.004],
@@ -84,7 +84,8 @@ export async function pudim() {
   deform(plate, (x, y, z) => {
     const r = Math.hypot(x, z);
     const th = Math.atan2(z, x);
-    const k = 1 + 0.014 * Math.cos(16 * th) * smoothstep(cm(12.5), cm(15), r);
+    // Scallops only cut inward, so the widest point stays exactly 31 cm.
+    const k = 1 - 0.028 * (0.5 - 0.5 * Math.cos(16 * th)) * smoothstep(cm(12.5), cm(15), r);
     return [x * k, y, z * k];
   });
   parts.push(plate);
@@ -93,7 +94,8 @@ export async function pudim() {
   const plateTop = (r) =>
     r < cm(11.8) ? BASE : r < cm(13) ? BASE + ((r - cm(11.8)) / cm(1.2)) * (0.0095 - BASE) : 0.0095;
   parts.push(
-    disc((th) => cm(12.2) + cm(3.2) * fbm([Math.cos(th), Math.sin(th), 0], 1.6, 3) + cm(1.6) * Math.max(0, Math.sin(th)), {
+    // Caramel stays inside the plate's rim (max 14 cm radius).
+    disc((th) => Math.min(cm(14), cm(12.2) + cm(3.2) * fbm([Math.cos(th), Math.sin(th), 0], 1.6, 3) + cm(1.6) * Math.max(0, Math.sin(th))), {
       nu: 120,
       nv: 18,
       height: (x, z, v) => plateTop(Math.hypot(x, z)) + 0.0003 + 0.0011 * (1 - v ** 6),

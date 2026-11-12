@@ -14,6 +14,7 @@ import { burrata, chocolateCake, shrimpRisotto } from "./demo/dishes.mjs";
 import { bake, writeGlb } from "./demo/export.mjs";
 import { pudim, pudimMenuPhoto } from "./demo/pudim.mjs";
 import { renderPhoto } from "./demo/render.mjs";
+import { checkModels } from "./check-models.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const imagesDir = path.join(root, "public", "images");
@@ -64,3 +65,5 @@ for (const dish of dishes) {
     `${dish.id}: ${(bytes / 1024 / 1024).toFixed(2)} MB, ${vertices} vertices, atlas ${atlas.width}x${atlas.height}, ${((Date.now() - started) / 1000).toFixed(1)}s`,
   );
 }
+
+if (!(await checkModels())) process.exit(1);

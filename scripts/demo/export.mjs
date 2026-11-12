@@ -4,6 +4,17 @@
 
 import sharp from "sharp";
 import { Document, NodeIO } from "@gltf-transform/core";
+import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
+import { draco } from "@gltf-transform/functions";
+import draco3d from "draco3dgltf";
+
+/** NodeIO that can read and write Draco-compressed meshes. */
+export async function createIO() {
+  return new NodeIO().registerExtensions([KHRDracoMeshCompression]).registerDependencies({
+    "draco3d.encoder": await draco3d.createEncoderModule(),
+    "draco3d.decoder": await draco3d.createDecoderModule(),
+  });
+}
 
 export const MATERIALS = {
   ceramic: 0.16,
@@ -137,7 +148,10 @@ export async function writeGlb(file, name, parts, atlas) {
     scene.addChild(doc.createNode(matName).setMesh(doc.createMesh(matName).addPrimitive(prim)));
   }
 
-  const bytes = await new NodeIO().writeBinary(doc);
+  // Draco shrinks geometry ~5-10x. 16-bit positions = 0.005 mm steps on a
+  // 31 cm plate, far below anything the eye (or AR tracking) can see.
+  await doc.transform(draco({ method: "edgebreaker", quantizePosition: 16, quantizeNormal: 10, quantizeTexcoord: 14 }));
+  const bytes = await (await createIO()).writeBinary(doc);
   const { writeFile } = await import("node:fs/promises");
   await writeFile(file, bytes);
   return bytes.byteLength;

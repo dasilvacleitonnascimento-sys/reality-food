@@ -4,39 +4,59 @@ import { useEffect, useRef, useState } from "react";
 import type { ModelViewerElement } from "@google/model-viewer";
 import type { FollowArSession, FollowArStatus } from "@/lib/ar/follow-ar";
 import { isFollowArSupported } from "@/lib/ar/support";
-import { formatPlateSize } from "@/lib/format";
+import type { ViewerText } from "@/lib/i18n/dictionaries";
+import { ArGuide } from "./ar-guide";
 
 type Props = {
   glbUrl: string;
   usdzUrl?: string;
   poster: string;
   alt: string;
-  plateDiameterCm: number;
+  text: ViewerText;
 };
 
 type ArStatus = "not-presenting" | "session-started" | "object-placed" | "failed";
+type ActiveStatus = Exclude<FollowArStatus, "ended">;
 
-const HINTS: Record<FollowArStatus, string> = {
-  loading: "Loading the dish…",
-  searching: "Point your camera at the table and move your phone slowly.",
-  following: "The dish follows your camera. Tap Place to set it down.",
-  placed: "Set down at true size. Walk around it or hold your hand next to it.",
-  ended: "",
-};
+const GUIDE_SEEN_KEY = "plate3d-ar-guide-seen";
 
-export function DishViewer({ glbUrl, usdzUrl, poster, alt, plateDiameterCm }: Props) {
+function guideSeen() {
+  try {
+    return localStorage.getItem(GUIDE_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markGuideSeen() {
+  try {
+    localStorage.setItem(GUIDE_SEEN_KEY, "1");
+  } catch {
+    // Private mode: the guide just shows again next time.
+  }
+}
+
+const buttonClass =
+  "h-14 rounded-xl bg-(--brand) text-base font-semibold text-white shadow-lg outline-none focus-visible:ring-4 focus-visible:ring-white/70 disabled:opacity-60";
+
+export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
   const viewerRef = useRef<HTMLElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<FollowArSession | null>(null);
   const followModuleRef = useRef<typeof import("@/lib/ar/follow-ar") | null>(null);
   const [progress, setProgress] = useState(0);
-  const [arSupported, setArSupported] = useState<boolean | null>(null);
+  const [nativeArSupported, setNativeArSupported] = useState<boolean | null>(null);
   const [followSupported, setFollowSupported] = useState<boolean | null>(null);
-  const [followStatus, setFollowStatus] = useState<FollowArStatus | null>(null);
+  const [followStatus, setFollowStatus] = useState<ActiveStatus | null>(null);
+  const [rulerOn, setRulerOn] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const [arFailed, setArFailed] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
+    // Self-hosted Draco decoder (models are Draco-compressed). Must be set before model-viewer loads.
+    const globalConfig = window as unknown as { ModelViewerElement?: Record<string, string> };
+    globalConfig.ModelViewerElement = { ...globalConfig.ModelViewerElement, dracoDecoderLocation: "/draco/" };
     // model-viewer touches `window`, so it is loaded only in the browser, only on this page.
     import("@google/model-viewer").catch(() => setLoadFailed(true));
 
@@ -44,7 +64,7 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, plateDiameterCm }: Pr
     isFollowArSupported().then((supported) => {
       if (cancelled) return;
       setFollowSupported(supported);
-      // Warm up three.js so the AR view opens fast when the diner taps.
+      // Warm up three.js so the AR view opens right away when the diner taps.
       if (supported) {
         import("@/lib/ar/follow-ar")
           .then((mod) => {
@@ -63,7 +83,7 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, plateDiameterCm }: Pr
     };
     const onLoad = () => {
       setProgress(1);
-      setArSupported(viewer.canActivateAR);
+      setNativeArSupported(viewer.canActivateAR);
     };
     const onError = () => setLoadFailed(true);
     const onArStatus = (event: Event) => {
@@ -86,13 +106,23 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, plateDiameterCm }: Pr
     };
   }, []);
 
-  const startFollow = async () => {
+  const canFollow = followSupported === true;
+
+  /** Opens the camera. Must run inside a tap (browsers require a user gesture). */
+  const openAr = async () => {
+    setShowGuide(false);
+    setArFailed(false);
+    if (!canFollow) {
+      // iPhone (AR Quick Look) and Android without WebXR (Scene Viewer).
+      (viewerRef.current as ModelViewerElement | null)?.activateAR();
+      return;
+    }
     const overlay = overlayRef.current;
     if (!overlay) return;
-    setArFailed(false);
     try {
       // Usually preloaded, so requestSession runs right inside this tap.
       const { startFollowAr } = followModuleRef.current ?? (await import("@/lib/ar/follow-ar"));
+      setRulerOn(false);
       sessionRef.current = await startFollowAr({
         glbUrl,
         overlay,
@@ -104,10 +134,28 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, plateDiameterCm }: Pr
     }
   };
 
+  const onViewTap = () => {
+    if (guideSeen()) {
+      void openAr();
+    } else {
+      setShowGuide(true);
+    }
+  };
+
+  const onGuideOpen = () => {
+    markGuideSeen();
+    void openAr();
+  };
+
+  const toggleRuler = () => {
+    const next = !rulerOn;
+    setRulerOn(next);
+    sessionRef.current?.setRuler(next);
+  };
+
   const isLoading = progress < 1 && !loadFailed;
-  const canFollow = followSupported === true;
-  const inFollow = followStatus !== null;
-  const canAr = canFollow || arSupported === true;
+  const canAr = canFollow || nativeArSupported === true;
+  const onTable = followStatus === "following" || followStatus === "placed";
 
   return (
     <div>
@@ -129,7 +177,7 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, plateDiameterCm }: Pr
         {isLoading && (
           <div
             role="progressbar"
-            aria-label="Loading 3D model"
+            aria-label={text.loading3d}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(progress * 100)}
@@ -142,71 +190,71 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, plateDiameterCm }: Pr
           </div>
         )}
 
-        {canFollow ? (
-          <button
-            type="button"
-            onClick={startFollow}
-            className="absolute inset-x-4 bottom-4 h-14 rounded-xl bg-(--brand) text-base font-semibold text-white shadow-lg outline-none focus-visible:ring-4 focus-visible:ring-white/70"
-          >
-            View on your table
-          </button>
-        ) : (
-          // model-viewer only shows this slot when the device supports AR (iOS Quick Look, Scene Viewer).
-          <button
-            slot="ar-button"
-            type="button"
-            className="absolute inset-x-4 bottom-4 h-14 rounded-xl bg-(--brand) text-base font-semibold text-white shadow-lg outline-none focus-visible:ring-4 focus-visible:ring-white/70"
-          >
-            View on your table
+        {canAr && (
+          <button type="button" onClick={onViewTap} className={`absolute inset-x-4 bottom-4 ${buttonClass}`}>
+            {text.viewOnTable}
           </button>
         )}
       </model-viewer>
 
       <div className="px-4 pt-3 text-sm text-muted-foreground" aria-live="polite">
         {loadFailed ? (
-          <p>The 3D model could not be loaded. Please check your connection.</p>
+          <p>{text.loadFailed}</p>
         ) : arFailed ? (
-          <p>AR could not start on this device. You can still rotate the dish above with your finger.</p>
-        ) : arSupported === false && followSupported === false ? (
-          <p>Open this page on your phone to see the dish on your table. Here you can drag to rotate it.</p>
+          <p>{text.arFailed}</p>
+        ) : nativeArSupported === false && followSupported === false ? (
+          <p>{text.notSupported}</p>
         ) : canAr ? (
-          <p>Tap the button, then point your camera at the table.</p>
+          <p>{text.tapHint}</p>
         ) : null}
       </div>
+
+      {showGuide && <ArGuide text={text.guide} onOpen={onGuideOpen} onCancel={() => setShowGuide(false)} />}
 
       {/* Shown on top of the camera during follow AR (WebXR DOM overlay). */}
       <div
         ref={overlayRef}
-        className={inFollow ? "fixed inset-0 z-50 flex flex-col justify-between p-4 text-white" : "hidden"}
+        className={followStatus ? "fixed inset-0 z-50 flex flex-col justify-between p-4 text-white" : "hidden"}
       >
-        {inFollow && (
+        {followStatus && (
           <>
             <div className="flex items-start justify-between gap-3">
-              <span className="rounded-full bg-black/60 px-3 py-1.5 text-sm font-semibold">
-                True size · {formatPlateSize(plateDiameterCm)} plate
-              </span>
+              <span className="rounded-full bg-black/60 px-3 py-1.5 text-sm font-semibold">{text.trueSize}</span>
               <button
                 type="button"
                 onClick={() => sessionRef.current?.end()}
-                className="size-11 rounded-full bg-black/60 text-xl font-semibold outline-none focus-visible:ring-4 focus-visible:ring-white/70"
-                aria-label="Close AR"
+                className="size-11 shrink-0 rounded-full bg-black/60 text-xl font-semibold outline-none focus-visible:ring-4 focus-visible:ring-white/70"
+                aria-label={text.close}
               >
                 ✕
               </button>
             </div>
 
             <div className="flex flex-col items-center gap-3">
-              <p className="max-w-xs rounded-xl bg-black/60 px-4 py-2 text-center text-sm">
-                {HINTS[followStatus]}
+              <p className="max-w-xs rounded-xl bg-black/60 px-4 py-2 text-center text-sm" aria-live="polite">
+                {text.hints[followStatus]}
               </p>
-              {(followStatus === "following" || followStatus === "placed") && (
-                <button
-                  type="button"
-                  onClick={() => sessionRef.current?.setPlaced(followStatus === "following")}
-                  className="h-14 w-full max-w-sm rounded-xl bg-(--brand) text-base font-semibold text-white shadow-lg outline-none focus-visible:ring-4 focus-visible:ring-white/70"
-                >
-                  {followStatus === "following" ? "Place here" : "Move dish"}
-                </button>
+              {(onTable || followStatus === "estimating") && (
+                <div className="flex w-full max-w-sm gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleRuler}
+                    aria-pressed={rulerOn}
+                    className={`h-14 shrink-0 rounded-xl px-4 text-base font-semibold outline-none focus-visible:ring-4 focus-visible:ring-white/70 ${
+                      rulerOn ? "bg-white text-black" : "bg-black/60 text-white"
+                    }`}
+                  >
+                    {text.ruler}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!onTable}
+                    onClick={() => sessionRef.current?.setPlaced(followStatus === "following")}
+                    className={`flex-1 ${buttonClass}`}
+                  >
+                    {followStatus === "placed" ? text.moveDish : text.placeHere}
+                  </button>
+                </div>
               )}
             </div>
           </>

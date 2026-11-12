@@ -8,10 +8,11 @@ import { formatPrice } from "@/lib/format";
 type Props = {
   dish: Dish;
   href: string;
+  soldOutLabel: string;
   preloadPhoto?: boolean;
 };
 
-export function DishCard({ dish, href, preloadPhoto = false }: Props) {
+export function DishCard({ dish, href, soldOutLabel, preloadPhoto = false }: Props) {
   const has3d = Boolean(dish.glbUrl);
 
   return (
@@ -29,7 +30,7 @@ export function DishCard({ dish, href, preloadPhoto = false }: Props) {
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           <span className="mr-1 font-semibold">{formatPrice(dish.price)}</span>
-          {!dish.isAvailable && <Badge variant="destructive">Sold out</Badge>}
+          {!dish.isAvailable && <Badge variant="destructive">{soldOutLabel}</Badge>}
           {dish.tags.map((tag) => (
             <Badge key={tag} variant="secondary">
               {tag}

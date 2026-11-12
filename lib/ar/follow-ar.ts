@@ -1,18 +1,31 @@
 // "Follow" AR mode (WebXR, Chrome on Android).
+//
 // The dish sits on the table exactly where the center of the screen points,
-// at true size, and slides along as the phone moves. "Place" freezes it in
-// place so the diner can walk around it or compare it with their hand.
+// at true size, and slides along as the phone moves. "Place" pins it with a
+// WebXR anchor so tracking corrections keep it glued to that spot while the
+// diner walks around it or compares it with their hand. An optional ruler,
+// measured from the model itself, shows the real size in centimeters.
 //
 // This module pulls in three.js, so only import it dynamically.
 
 import * as THREE from "three";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 
-export type FollowArStatus = "loading" | "searching" | "following" | "placed" | "ended";
+export type FollowArStatus =
+  | "loading"
+  | "searching" // looking for the table
+  | "estimating" // table not found yet: dish shown in front of the phone
+  | "following" // dish on the table, following the center of the screen
+  | "placed" // dish pinned to the table
+  | "ended";
 
 export type FollowArSession = {
+  /** Plate width measured from the model, in cm. */
+  plateWidthCm: number;
   setPlaced(placed: boolean): void;
+  setRuler(visible: boolean): void;
   end(): Promise<void>;
 };
 
@@ -24,10 +37,56 @@ type Options = {
 };
 
 const MIN_UP = 0.85; // only accept roughly horizontal surfaces (tables, not walls)
+const SEARCH_TIMEOUT_MS = 4000; // then show the dish in front of the phone anyway
+const RULER_WIDTH = 0.03; // 3 cm wide ruler
+const RULER_GAP = 0.012; // between the plate's edge and the ruler
 
 function lerpAngle(a: number, b: number, t: number) {
   const d = Math.atan2(Math.sin(b - a), Math.cos(b - a));
   return a + d * t;
+}
+
+/** A flat ruler, 0 at the plate's left edge, so the plate spans 0 -> its diameter. */
+function makeRuler(plateWidth: number, maxAnisotropy: number) {
+  const lengthCm = Math.ceil(plateWidth * 100) + 2;
+  const length = lengthCm / 100;
+  const pxPerCm = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = lengthCm * pxPerCm;
+  canvas.height = Math.round(RULER_WIDTH * 100 * pxPerCm);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D is not available");
+  const h = canvas.height;
+  ctx.fillStyle = "rgba(255, 255, 255, 0.93)";
+  ctx.fillRect(0, 0, canvas.width, h);
+  ctx.fillStyle = "#1c1714";
+  ctx.font = `600 ${Math.round(h * 0.32)}px system-ui, sans-serif`;
+  ctx.textBaseline = "bottom";
+  for (let mm = 0; mm <= lengthCm * 10; mm++) {
+    const x = (mm / 10) * pxPerCm;
+    const tick = mm % 10 === 0 ? (mm % 50 === 0 ? 0.55 : 0.4) : mm % 5 === 0 ? 0.25 : 0.14;
+    ctx.fillRect(Math.min(x, canvas.width - 2), 0, mm % 10 === 0 ? 3 : 1.5, h * tick);
+    if (mm % 50 === 0 && mm > 0) ctx.fillText(String(mm / 10), x + 6, h - 6);
+  }
+  // Mark the plate's measured diameter.
+  const plateX = plateWidth * 100 * pxPerCm;
+  ctx.fillStyle = "#b93a15";
+  ctx.fillRect(plateX - 2, 0, 4, h);
+  ctx.textAlign = "right";
+  ctx.fillText(`${(plateWidth * 100).toFixed(1)} cm`, plateX - 8, h - 6);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = maxAnisotropy;
+  const ruler = new THREE.Mesh(
+    new THREE.PlaneGeometry(length, RULER_WIDTH),
+    new THREE.MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }),
+  );
+  ruler.rotation.x = -Math.PI / 2;
+  // Lies on the table, in front of the plate (the side facing the diner).
+  ruler.position.set(-plateWidth / 2 + length / 2, 0.0015, plateWidth / 2 + RULER_GAP + RULER_WIDTH / 2);
+  ruler.visible = false;
+  return ruler;
 }
 
 /** Must be called directly from a tap handler (browsers require a user gesture). */
@@ -38,7 +97,7 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
   // Request the session first, while we still have the user gesture.
   const session = await xr.requestSession("immersive-ar", {
     requiredFeatures: ["hit-test"],
-    optionalFeatures: ["dom-overlay"],
+    optionalFeatures: ["dom-overlay", "anchors"],
     domOverlay: { root: overlay },
   });
   onStatus("loading");
@@ -73,10 +132,7 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
   dish.add(sun, sun.target);
 
   // Invisible floor that only shows the shadow, so the plate looks grounded.
-  const shadowCatcher = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.9, 0.9),
-    new THREE.ShadowMaterial({ opacity: 0.28 }),
-  );
+  const shadowCatcher = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), new THREE.ShadowMaterial({ opacity: 0.28 }));
   shadowCatcher.rotation.x = -Math.PI / 2;
   shadowCatcher.position.y = 0.0005;
   shadowCatcher.receiveShadow = true;
@@ -88,8 +144,11 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
     renderer.dispose();
   };
 
+  let plateWidth = 0;
+  let ruler: THREE.Mesh | null = null;
   try {
-    const gltf = await new GLTFLoader().loadAsync(glbUrl);
+    const loader = new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath("/draco/"));
+    const gltf = await loader.loadAsync(glbUrl);
     gltf.scene.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         obj.castShadow = true;
@@ -98,6 +157,10 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
     });
     // The model is in meters: no scaling, so it is always true to size.
     dish.add(gltf.scene);
+    const size = new THREE.Box3().setFromObject(gltf.scene).getSize(new THREE.Vector3());
+    plateWidth = Math.max(size.x, size.z);
+    ruler = makeRuler(plateWidth, renderer.capabilities.getMaxAnisotropy());
+    dish.add(ruler);
 
     await renderer.xr.setSession(session);
   } catch (error) {
@@ -115,42 +178,89 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
     throw new Error("Hit testing is not available");
   }
 
+  let status: FollowArStatus = "searching";
+  const setStatus = (next: FollowArStatus) => {
+    if (next === status) return;
+    status = next;
+    onStatus(next);
+  };
   onStatus("searching");
 
+  const searchStarted = performance.now();
   let placed = false;
-  let found = false;
+  let onTable = false;
+  let wantAnchor = false;
+  let anchor: XRAnchor | null = null;
   const target = new THREE.Vector3();
   const camPos = new THREE.Vector3();
-  const hitMatrix = new THREE.Matrix4();
-  const hitQuat = new THREE.Quaternion();
+  const camDir = new THREE.Vector3();
+  const tmp = new THREE.Matrix4();
+  const tmpQuat = new THREE.Quaternion();
   const up = new THREE.Vector3();
 
-  renderer.setAnimationLoop((_time, frame) => {
+  renderer.setAnimationLoop((time, frame) => {
     const refSpace = renderer.xr.getReferenceSpace();
-    if (frame && refSpace && !placed) {
-      for (const hit of frame.getHitTestResults(hitSource)) {
-        const pose = hit.getPose(refSpace);
-        if (!pose) continue;
-        hitMatrix.fromArray(pose.transform.matrix);
-        hitQuat.setFromRotationMatrix(hitMatrix);
-        up.set(0, 1, 0).applyQuaternion(hitQuat);
-        if (up.y < MIN_UP) continue;
-        target.setFromMatrixPosition(hitMatrix);
-        if (!found) {
-          found = true;
-          dish.position.copy(target);
+    const xrCamera = renderer.xr.getCamera();
+    camPos.setFromMatrixPosition(xrCamera.matrixWorld);
+
+    if (frame && refSpace) {
+      if (!placed) {
+        for (const hit of frame.getHitTestResults(hitSource)) {
+          const pose = hit.getPose(refSpace);
+          if (!pose) continue;
+          tmp.fromArray(pose.transform.matrix);
+          up.set(0, 1, 0).applyQuaternion(tmpQuat.setFromRotationMatrix(tmp));
+          if (up.y < MIN_UP) continue;
+          target.setFromMatrixPosition(tmp);
+          if (!onTable) {
+            // First real table hit: jump there (no slow slide from a guess).
+            dish.position.copy(target);
+            onTable = true;
+          }
           dish.visible = true;
-          onStatus("following");
+          setStatus("following");
+          break;
         }
-        break;
+
+        if (!onTable && time - searchStarted > SEARCH_TIMEOUT_MS) {
+          // Plan B: no table yet. Show the dish (still true size) in front of the
+          // phone, roughly where a table would be, and keep looking.
+          camDir.set(0, 0, -1).applyQuaternion(xrCamera.quaternion);
+          camDir.y = 0;
+          camDir.normalize();
+          target.copy(camPos).addScaledVector(camDir, 0.45);
+          target.y = camPos.y - 0.4;
+          if (!dish.visible) dish.position.copy(target);
+          dish.visible = true;
+          setStatus("estimating");
+        }
+      }
+
+      // Pin the placed dish with an anchor (created inside a frame, as WebXR requires).
+      if (placed && wantAnchor && frame.createAnchor) {
+        wantAnchor = false;
+        const transform = new XRRigidTransform(
+          { x: dish.position.x, y: dish.position.y, z: dish.position.z },
+          { x: 0, y: 0, z: 0, w: 1 },
+        );
+        frame
+          .createAnchor(transform, refSpace)
+          ?.then((created) => {
+            if (placed) anchor = created;
+            else created.delete();
+          })
+          .catch(() => {});
+      }
+      if (placed && anchor && frame.trackedAnchors?.has(anchor)) {
+        const pose = frame.getPose(anchor.anchorSpace, refSpace);
+        if (pose) dish.position.setFromMatrixPosition(tmp.fromArray(pose.transform.matrix));
       }
     }
 
-    if (found && !placed) {
+    if (dish.visible && !placed) {
       // Smooth the motion so tracking noise doesn't make the plate jitter.
       dish.position.lerp(target, 0.3);
-      // Turn the front of the dish toward the diner.
-      camPos.setFromMatrixPosition(renderer.xr.getCamera().matrixWorld);
+      // Turn the front of the dish (and the ruler) toward the diner.
       const yaw = Math.atan2(camPos.x - dish.position.x, camPos.z - dish.position.z);
       dish.rotation.y = lerpAngle(dish.rotation.y, yaw, 0.2);
     }
@@ -160,16 +270,30 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
 
   session.addEventListener("end", () => {
     hitSource.cancel();
+    anchor?.delete();
     cleanup();
     onStatus("ended");
   });
 
   return {
+    plateWidthCm: Math.round(plateWidth * 1000) / 10,
     setPlaced(value) {
-      if (!found) return;
+      // Only pin the dish once it is really on the table.
+      if (value && !onTable) return;
       placed = value;
-      if (!value) target.copy(dish.position);
-      onStatus(value ? "placed" : "following");
+      if (value) {
+        wantAnchor = true;
+        setStatus("placed");
+      } else {
+        anchor?.delete();
+        anchor = null;
+        wantAnchor = false;
+        target.copy(dish.position);
+        setStatus("following");
+      }
+    },
+    setRuler(visible) {
+      if (ruler) ruler.visible = visible;
     },
     async end() {
       await session.end().catch(() => {});

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Category } from "@/lib/demo-data";
 
-export function CategoryTabs({ categories }: { categories: Category[] }) {
+export function CategoryTabs({ categories, label }: { categories: Category[]; label: string }) {
   const [activeId, setActiveId] = useState(categories[0]?.id);
 
   // Highlight the tab of the section currently near the top of the screen.
@@ -35,7 +35,7 @@ export function CategoryTabs({ categories }: { categories: Category[] }) {
 
   return (
     <nav
-      aria-label="Menu categories"
+      aria-label={label}
       className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur"
     >
       <ul className="flex gap-2 overflow-x-auto px-4 py-2">

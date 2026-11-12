@@ -25,6 +25,14 @@ export type Dish = {
   isAvailable: boolean;
 };
 
+/** Translated restaurant content. Anything missing falls back to English. */
+export type RestaurantTranslation = {
+  tagline?: string;
+  categories?: Partial<Record<CategoryId, string>>;
+  dishes?: Record<string, { name?: string; description?: string }>;
+  tags?: Record<string, string>;
+};
+
 export type Restaurant = {
   name: string;
   slug: string;
@@ -34,6 +42,8 @@ export type Restaurant = {
   primaryColor: string;
   categories: Category[];
   dishes: Dish[];
+  /** Base content is English; other languages are listed here. */
+  translations?: { es?: RestaurantTranslation };
 };
 
 export const demoBistro: Restaurant = {
@@ -101,6 +111,40 @@ export const demoBistro: Restaurant = {
       isAvailable: true,
     },
   ],
+  translations: {
+    es: {
+      tagline: "Platos de temporada, hechos en casa.",
+      categories: { starters: "Entradas", mains: "Platos fuertes", desserts: "Postres" },
+      dishes: {
+        burrata: {
+          name: "Burrata con tomates heirloom",
+          description:
+            "Burrata cremosa, tomates heirloom y cherry, albahaca fresca, aceite de oliva y sal en escamas.",
+        },
+        "shrimp-risotto": {
+          name: "Risotto de camarones",
+          description:
+            "Arroz arborio cremoso con camarones jumbo, parmesano, perejil y un toque de aceite de oliva.",
+        },
+        "chocolate-cake": {
+          name: "Pastel triple chocolate",
+          description:
+            "Capas de bizcocho de chocolate oscuro y ganache de chocolate con leche, con crema batida y frambuesas frescas.",
+        },
+        pudim: {
+          name: "Pudim (flan brasileño)",
+          description:
+            "Flan sedoso de leche condensada bañado en caramelo dorado. Flan entero, para 8 personas.",
+        },
+      },
+      tags: {
+        Vegetarian: "Vegetariano",
+        "Gluten-free": "Sin gluten",
+        "Chef's pick": "Recomendación del chef",
+        "To share": "Para compartir",
+      },
+    },
+  },
 };
 
 const restaurants: Restaurant[] = [demoBistro];
@@ -109,8 +153,23 @@ export function getRestaurants(): Restaurant[] {
   return restaurants;
 }
 
-export function getRestaurant(slug: string): Restaurant | undefined {
-  return restaurants.find((r) => r.slug === slug);
+/** Returns the restaurant with its content in the requested language ("en" or "es"). */
+export function getRestaurant(slug: string, locale: string = "en"): Restaurant | undefined {
+  const restaurant = restaurants.find((r) => r.slug === slug);
+  if (!restaurant) return undefined;
+  const t = locale === "es" ? restaurant.translations?.es : undefined;
+  if (!t) return restaurant;
+  return {
+    ...restaurant,
+    tagline: t.tagline ?? restaurant.tagline,
+    categories: restaurant.categories.map((c) => ({ ...c, name: t.categories?.[c.id] ?? c.name })),
+    dishes: restaurant.dishes.map((d) => ({
+      ...d,
+      name: t.dishes?.[d.id]?.name ?? d.name,
+      description: t.dishes?.[d.id]?.description ?? d.description,
+      tags: d.tags.map((tag) => t.tags?.[tag] ?? tag),
+    })),
+  };
 }
 
 export function getDish(

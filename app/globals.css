@@ -128,3 +128,33 @@
     @apply font-sans;
   }
 }
+/* We render our own "View on your table" button. */
+model-viewer::part(default-ar-button) {
+  display: none;
+}
+
+/* AR guide: a phone sweeping slowly over the table. */
+@keyframes ar-guide-sweep {
+  0%,
+  100% {
+    transform: translateX(-180%) rotate(-8deg);
+  }
+  50% {
+    transform: translateX(80%) rotate(8deg);
+  }
+}
+
+.ar-guide-phone {
+  animation: ar-guide-sweep 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-guide-phone {
+    animation: none;
+  }
+}
+
+/* The photo shown while the 3D model loads fills the square viewer. */
+model-viewer::part(default-poster) {
+  background-size: cover;
+}

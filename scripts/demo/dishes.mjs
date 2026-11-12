@@ -478,16 +478,18 @@ export function burrata() {
 
   // Stracciatella spilling out toward the front.
   parts.push(
+    // Upper half only: the cream sits on the plate instead of sinking through it.
     ellipsoid(cm(3.4), cm(1.3), cm(2.6), {
       nu: 40,
-      nv: 18,
+      nv: 12,
+      phi1: Math.PI / 2,
       material: "satin",
       k: 2,
       disp: (d) => (fbm(d, 5, 4) - 0.5) * 0.5,
       color: (p) => mix(hex("#fbf5e6"), hex("#e2d4b6"), fbm(p, 260, 3)),
     })
       .rotY(-0.5)
-      .move(bx + cm(2.2), base + cm(0.3), bz + cm(3.0)),
+      .move(bx + cm(2.2), base + 0.0003, bz + cm(3.0)),
   );
 
   // Heirloom slices.
