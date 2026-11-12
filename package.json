@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "demo-assets": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-demo-assets.mjs",
-    "check-models": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-models.mjs"
+    "check-models": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-models.mjs",
+    "import-model": "node scripts/import-model.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -36,6 +37,7 @@
     "draco3dgltf": "^1.5.7",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "meshoptimizer": "^0.22.0",
     "tailwindcss": "4.3.3",
     "typescript": "^5"
   }
