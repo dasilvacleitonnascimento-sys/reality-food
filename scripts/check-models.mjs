@@ -47,13 +47,13 @@ export async function checkModels() {
       if (Math.hypot(...center) > LIMITS.offCenter) problems.push(`off center by ${(Math.hypot(...center) * 1000).toFixed(1)} mm`);
       if (size > LIMITS.maxBytes) problems.push(`file is ${(size / 1048576).toFixed(1)} MB (max 5 MB)`);
 
-      // Food only: skip the plate (ceramic) and sauces pooled on it (gloss).
+      // Food only: skip the plate (ceramic) and sauces pooled on it (sauce).
       let portion = "";
       if (dish.portionCm) {
         const food = doc
           .getRoot()
           .listNodes()
-          .filter((n) => n.getMesh() && !["ceramic", "gloss"].includes(n.getName()))
+          .filter((n) => n.getMesh() && !["ceramic", "sauce"].includes(n.getName()))
           .map((n) => getBounds(n));
         const min = [0, 1, 2].map((i) => Math.min(...food.map((f) => f.min[i])));
         const max = [0, 1, 2].map((i) => Math.max(...food.map((f) => f.max[i])));

@@ -20,6 +20,8 @@ export const MATERIALS = {
   ceramic: 0.16,
   gloss: 0.1,
   satin: 0.42,
+  glaze: 0.28, // moist custard
+  sauce: 0.08, // sauces pooled on the plate (not counted as the portion)
   matte: 0.78,
 };
 

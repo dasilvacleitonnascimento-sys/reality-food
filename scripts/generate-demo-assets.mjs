@@ -12,7 +12,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { burrata, chocolateCake, shrimpRisotto } from "./demo/dishes.mjs";
 import { bake, writeGlb } from "./demo/export.mjs";
-import { pudim, pudimMenuPhoto, pudimSlice } from "./demo/pudim.mjs";
+import { pudim, pudimSlice } from "./demo/pudim.mjs";
 import { renderPhoto } from "./demo/render.mjs";
 import { checkModels } from "./check-models.mjs";
 
@@ -34,9 +34,10 @@ const dishes = [
   { id: "chocolate-cake", build: chocolateCake, plateCm: 20, height: 0.035 },
   { id: "burrata", build: burrata, plateCm: 23, height: 0.025 },
   { id: "shrimp-risotto", build: shrimpRisotto, plateCm: 27, height: 0.025 },
-  // Built from a real photo; the menu shows the real photo, the render is a preview.
-  { id: "pudim", build: pudim, plateCm: 31, height: 0.03, menuPhoto: pudimMenuPhoto },
-  { id: "pudim-slice", build: pudimSlice, plateCm: 18, height: 0.03, azimuth: 55 },
+  // Built from a real photo (scripts/demo/photos). The real photo has a price
+  // tag in it, so the menu shows a render of the model instead.
+  { id: "pudim", build: pudim, plateCm: 30, height: 0.04 },
+  { id: "pudim-slice", build: pudimSlice, plateCm: 18, height: 0.04, azimuth: -50 },
 ];
 
 const only = process.argv[2];
