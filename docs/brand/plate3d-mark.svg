@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Plate3D">
+  <!-- AR scan corners -->
+  <path d="M7 19V12a5 5 0 0 1 5-5h7M45 7h7a5 5 0 0 1 5 5v7M57 45v7a5 5 0 0 1-5 5h-7M19 57h-7a5 5 0 0 1-5-5v-7" fill="none" stroke="#1C1714" stroke-width="4" stroke-linecap="round"/>
+  <!-- Plate on the table, in perspective -->
+  <ellipse cx="32" cy="40" rx="17" ry="5" fill="#1C1714" opacity="0.18"/>
+  <ellipse cx="32" cy="35" rx="18" ry="10.5" fill="#E8643A"/>
+  <ellipse cx="32" cy="35" rx="11" ry="6.2" fill="none" stroke="#FAF6EF" stroke-width="2"/>
+  <!-- The dish -->
+  <ellipse cx="32" cy="31.5" rx="6.5" ry="5.5" fill="#F3B63F"/>
+</svg>

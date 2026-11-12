@@ -41,3 +41,7 @@ The entire product UI is English only. All copy, labels, emails and errors are i
 - After each feature, run the type check and linter and fix all errors.
 - Explain to me in simple terms what you built and how to test it on my phone.
 - Never commit secrets. Keep secrets in .env.local and list required variables in .env.example.
+
+## Brand
+- Plate3D's own brand (landing page, owner dashboard, admin, sales material) follows docs/brand/BRAND.md: colors, fonts (Fraunces + Manrope), logo files and voice.
+- Diner menus use each restaurant's own brand color, not Plate3D's.

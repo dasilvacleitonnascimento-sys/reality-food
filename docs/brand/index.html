@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plate3D Brand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --espresso: #1C1714; --porcelain: #FAF6EF; --linen: #EDE5D8; --stone: #6B625A;
+    --paprika: #E8643A; --paprika-deep: #B93A15; --saffron: #F3B63F; --basil: #2E6A4E;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--porcelain); color: var(--espresso); font: 16px/1.55 Manrope, system-ui, sans-serif; }
+  h1, h2, h3, .serif { font-family: Fraunces, Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+  main { max-width: 1080px; margin: 0 auto; padding: 0 16px 80px; }
+  section { padding: 56px 0 8px; }
+  h2 { font-size: 28px; margin: 0 0 6px; }
+  .lead { color: var(--stone); margin: 0 0 24px; max-width: 640px; }
+  .label { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--paprika-deep); }
+
+  .hero { background: var(--espresso); color: var(--porcelain); }
+  .hero-inner { max-width: 1080px; margin: 0 auto; padding: 48px 16px 56px; display: grid; gap: 32px; grid-template-columns: 1.1fr 1fr; align-items: center; }
+  .hero h1 { font-size: clamp(36px, 6vw, 60px); line-height: 1.05; margin: 20px 0 16px; }
+  .hero h1 em { font-style: normal; color: var(--paprika); }
+  .hero p { color: #d8cfc3; font-size: 18px; margin: 0 0 28px; max-width: 460px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px; border-radius: 14px; background: var(--paprika-deep); color: #fff; font-weight: 700; text-decoration: none; border: 0; font-size: 16px; }
+  .btn.ghost { background: transparent; color: var(--porcelain); box-shadow: inset 0 0 0 1.5px #5a4f47; }
+  .hero-photo { position: relative; border-radius: 24px; overflow: hidden; aspect-ratio: 4/3; box-shadow: 0 30px 60px rgba(0,0,0,.45); }
+  .hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .corner { position: absolute; width: 34px; height: 34px; border: 4px solid var(--porcelain); }
+  .corner.tl { top: 16px; left: 16px; border-right: 0; border-bottom: 0; border-top-left-radius: 10px; }
+  .corner.tr { top: 16px; right: 16px; border-left: 0; border-bottom: 0; border-top-right-radius: 10px; }
+  .corner.bl { bottom: 16px; left: 16px; border-right: 0; border-top: 0; border-bottom-left-radius: 10px; }
+  .corner.br { bottom: 16px; right: 16px; border-left: 0; border-top: 0; border-bottom-right-radius: 10px; }
+  .size-tag { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--saffron); color: var(--espresso); font-weight: 700; font-size: 14px; padding: 6px 12px; border-radius: 999px; }
+
+  .logos { display: grid; gap: 16px; grid-template-columns: 2fr 2fr 1fr; }
+  .tile { border-radius: 20px; padding: 32px; display: grid; place-items: center; min-height: 170px; background: #fff; border: 1px solid var(--linen); }
+  .tile.dark { background: var(--espresso); border-color: var(--espresso); }
+  .tile img { max-width: 100%; height: auto; }
+
+  .swatches { display: grid; gap: 14px; grid-template-columns: repeat(4, 1fr); }
+  .swatch { border-radius: 18px; overflow: hidden; border: 1px solid var(--linen); background: #fff; }
+  .chip { height: 110px; display: flex; align-items: flex-end; padding: 12px 14px; font-weight: 700; font-size: 13px; }
+  .swatch .meta { padding: 12px 14px 14px; font-size: 13px; color: var(--stone); }
+  .swatch .meta b { display: block; color: var(--espresso); font-size: 15px; }
+
+  .type { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+  .card { background: #fff; border: 1px solid var(--linen); border-radius: 20px; padding: 28px; }
+  .big { font-size: 64px; line-height: 1; margin: 8px 0 12px; }
+
+  .phone { width: 300px; max-width: 100%; margin: 0 auto; background: var(--espresso); border-radius: 40px; padding: 12px; box-shadow: 0 30px 60px rgba(28,23,20,.25); }
+  .screen { background: #fff; border-radius: 30px; overflow: hidden; }
+  .screen .ph { aspect-ratio: 1; background: var(--linen); position: relative; }
+  .screen .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .screen .body { padding: 16px; }
+  .badge { display: inline-block; background: var(--saffron); color: var(--espresso); font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 6px; }
+  .tag { display: inline-block; background: #e3efe8; color: var(--basil); font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 6px; }
+  .ui { display: grid; gap: 24px; grid-template-columns: 300px 1fr; align-items: center; }
+  .menu-list { display: grid; gap: 12px; }
+  .row { display: flex; gap: 14px; align-items: center; background: #fff; border: 1px solid var(--linen); border-radius: 16px; padding: 12px; }
+  .row img { width: 88px; height: 88px; object-fit: cover; border-radius: 12px; flex-shrink: 0; }
+  .row h3 { font-size: 17px; margin: 0 0 2px; }
+  .row p { margin: 0; font-size: 14px; color: var(--stone); }
+
+  .voice { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+  .do, .dont { border-radius: 18px; padding: 22px; }
+  .do { background: #e3efe8; } .dont { background: #f6e3dc; }
+  .do h3 { color: var(--basil); margin: 0 0 8px; } .dont h3 { color: var(--paprika-deep); margin: 0 0 8px; }
+  .do p, .dont p { margin: 6px 0; }
+  .quote { font-family: Fraunces, Georgia, serif; font-size: clamp(26px, 4vw, 38px); line-height: 1.15; margin: 0; }
+
+  @media (max-width: 820px) {
+    .hero-inner, .type, .ui, .voice { grid-template-columns: 1fr; }
+    .logos { grid-template-columns: 1fr; }
+    .swatches { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <img src="plate3d-logo-dark.svg" alt="Plate3D" width="200" height="52">
+      <h1>See it on your table <em>before you order.</em></h1>
+      <p>Diners scan the QR code, tap a dish and see it at true size, right where it will be served. No app. No guessing.</p>
+      <a class="btn" href="#">Book a demo</a>
+      <a class="btn ghost" href="#">See a live menu</a>
+    </div>
+    <div class="hero-photo">
+      <img src="../../public/images/chocolate-cake.jpg" alt="Chocolate cake slice shown at true size on a table">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <span class="size-tag">True size · 20 cm plate</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="label">Logo</div>
+    <h2>A dish, seen through the camera</h2>
+    <p class="lead">A plate in perspective, sitting on the table, framed by AR scan corners. It works as small as a favicon and as big as a storefront sticker.</p>
+    <div class="logos">
+      <div class="tile"><img src="plate3d-logo.svg" alt="Plate3D logo on light" width="300" height="78"></div>
+      <div class="tile dark"><img src="plate3d-logo-dark.svg" alt="Plate3D logo on dark" width="300" height="78"></div>
+      <div class="tile"><img src="plate3d-mark.svg" alt="Plate3D mark" width="88" height="88"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Color</div>
+    <h2>Porcelain, espresso and a pinch of paprika</h2>
+    <p class="lead">Warm, appetizing colors taken from the table, not from tech. The accent is a garnish: about 10% of any screen.</p>
+    <div class="swatches">
+      <div class="swatch"><div class="chip" style="background:#1C1714;color:#FAF6EF">Aa 16.5:1</div><div class="meta"><b>Espresso</b>#1C1714 · text, logo, dark sections</div></div>
+      <div class="swatch"><div class="chip" style="background:#FAF6EF;color:#1C1714">Aa</div><div class="meta"><b>Porcelain</b>#FAF6EF · main background</div></div>
+      <div class="swatch"><div class="chip" style="background:#EDE5D8;color:#1C1714">Aa</div><div class="meta"><b>Linen</b>#EDE5D8 · cards, borders</div></div>
+      <div class="swatch"><div class="chip" style="background:#6B625A;color:#FAF6EF">Aa 5.5:1</div><div class="meta"><b>Stone</b>#6B625A · secondary text</div></div>
+      <div class="swatch"><div class="chip" style="background:#E8643A;color:#1C1714">Accent</div><div class="meta"><b>Paprika</b>#E8643A · brand accent, on dark</div></div>
+      <div class="swatch"><div class="chip" style="background:#B93A15;color:#fff">Aa 5.7:1</div><div class="meta"><b>Paprika Deep</b>#B93A15 · buttons, links</div></div>
+      <div class="swatch"><div class="chip" style="background:#F3B63F;color:#1C1714">Aa 9.8:1</div><div class="meta"><b>Saffron</b>#F3B63F · 3D badge, highlights</div></div>
+      <div class="swatch"><div class="chip" style="background:#2E6A4E;color:#fff">Aa 6.4:1</div><div class="meta"><b>Basil</b>#2E6A4E · success, available</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Typography</div>
+    <h2>A menu serif with a clean sidekick</h2>
+    <p class="lead">Both free on Google Fonts.</p>
+    <div class="type">
+      <div class="card"><div class="label" style="color:var(--stone)">Headlines · Fraunces SemiBold</div><div class="big serif">Aa</div><div class="serif" style="font-size:26px;line-height:1.2">Your menu, true to size.</div></div>
+      <div class="card"><div class="label" style="color:var(--stone)">UI &amp; body · Manrope</div><div class="big" style="font-weight:700">Aa</div><p style="margin:0">Burrata &amp; Heirloom Tomatoes · <b>$17</b><br><span style="color:var(--stone)">Creamy burrata, heirloom and cherry tomatoes, fresh basil.</span></p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">In the product</div>
+    <h2>The dish is the hero</h2>
+    <p class="lead">Big photos, a clear price, a "3D" badge and one obvious button. Diner menus take each restaurant's own color; this is the Plate3D default.</p>
+    <div class="ui">
+      <div class="phone"><div class="screen">
+        <div class="ph"><img src="../../public/images/shrimp-risotto.jpg" alt="Shrimp risotto"></div>
+        <div class="body">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3 class="serif" style="margin:0;font-size:20px">Shrimp Risotto</h3><b>$29</b></div>
+          <p style="margin:6px 0 14px;font-size:14px;color:var(--stone)">Arborio rice, jumbo shrimp, parmesan, parsley.</p>
+          <button class="btn" style="width:100%;justify-content:center" type="button">View on your table</button>
+        </div>
+      </div></div>
+      <div class="menu-list">
+        <div class="row"><img src="../../public/images/burrata.jpg" alt="Burrata"><div><h3 class="serif">Burrata &amp; Heirloom Tomatoes</h3><p>$17 · <span class="badge">3D</span> <span class="tag">Vegetarian</span></p></div></div>
+        <div class="row"><img src="../../public/images/shrimp-risotto.jpg" alt="Shrimp risotto"><div><h3 class="serif">Shrimp Risotto</h3><p>$29 · <span class="badge">3D</span> <span class="tag">Chef's pick</span></p></div></div>
+        <div class="row"><img src="../../public/images/chocolate-cake.jpg" alt="Chocolate cake"><div><h3 class="serif">Triple Chocolate Cake</h3><p>$12 · <span class="badge">3D</span></p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Voice</div>
+    <h2>A great host, not a tech company</h2>
+    <p class="lead">Talk about appetite and revenue. Keep the technology invisible.</p>
+    <div class="voice">
+      <div class="do"><h3>Say</h3><p>"See it on your table before you order."</p><p>"Guests who see dessert order dessert."</p><p>"Live in a day. No app for your guests."</p></div>
+      <div class="dont"><h3>Avoid</h3><p>"Immersive augmented reality experience."</p><p>"WebXR-powered 3D asset pipeline."</p><p>"Revolutionary, disruptive, next-gen."</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card" style="background:var(--espresso);color:var(--porcelain);border:0;padding:40px">
+      <div class="label" style="color:var(--saffron)">Sales line</div>
+      <p class="quote">The menu that sells with its eyes.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>
