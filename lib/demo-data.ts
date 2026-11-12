@@ -1,0 +1,143 @@
+// Day-1 prototype data. Replaced by Supabase in Prompt 2.
+
+export type CategoryId = "starters" | "mains" | "desserts";
+
+export type Category = {
+  id: CategoryId;
+  name: string;
+};
+
+export type Dish = {
+  id: string;
+  name: string;
+  description: string;
+  /** Price in US dollars. */
+  price: number;
+  category: CategoryId;
+  /** Path under /public, 4:3 aspect ratio. */
+  photo: string;
+  /** Path under /public. Only some dishes have a 3D model. */
+  glbUrl?: string;
+  /** Optional iOS model. If missing, model-viewer generates USDZ on the fly. */
+  usdzUrl?: string;
+  plateDiameterCm: number;
+  tags: string[];
+  isAvailable: boolean;
+};
+
+export type Restaurant = {
+  name: string;
+  slug: string;
+  logo: string;
+  tagline: string;
+  /** Brand color for buttons and accents. Must pass 4.5:1 contrast with white text. */
+  primaryColor: string;
+  categories: Category[];
+  dishes: Dish[];
+};
+
+export const demoBistro: Restaurant = {
+  name: "Demo Bistro",
+  slug: "demo-bistro",
+  logo: "/images/demo-bistro-logo.svg",
+  tagline: "Seasonal plates, made from scratch.",
+  primaryColor: "#9a3412",
+  categories: [
+    { id: "starters", name: "Starters" },
+    { id: "mains", name: "Mains" },
+    { id: "desserts", name: "Desserts" },
+  ],
+  dishes: [
+    {
+      id: "burrata",
+      name: "Burrata & Heirloom Tomatoes",
+      description:
+        "Creamy burrata, heirloom tomatoes, basil oil and flaky sea salt.",
+      price: 16,
+      category: "starters",
+      photo: "/images/burrata.jpg",
+      glbUrl: "/models/burrata.glb",
+      plateDiameterCm: 23,
+      tags: ["Vegetarian"],
+      isAvailable: true,
+    },
+    {
+      id: "spicy-wings",
+      name: "Chili Honey Wings",
+      description:
+        "Crispy chicken wings tossed in chili honey glaze, with ranch on the side.",
+      price: 14,
+      category: "starters",
+      photo: "/images/spicy-wings.jpg",
+      plateDiameterCm: 25,
+      tags: ["Spicy"],
+      isAvailable: true,
+    },
+    {
+      id: "smash-burger",
+      name: "Classic Smash Burger",
+      description:
+        "Two smashed beef patties, American cheese, pickles and house sauce on a brioche bun.",
+      price: 19,
+      category: "mains",
+      photo: "/images/smash-burger.jpg",
+      glbUrl: "/models/smash-burger.glb",
+      plateDiameterCm: 27,
+      tags: ["Chef's pick"],
+      isAvailable: true,
+    },
+    {
+      id: "green-curry",
+      name: "Green Curry Bowl",
+      description:
+        "Coconut green curry with seasonal vegetables, tofu and jasmine rice.",
+      price: 18,
+      category: "mains",
+      photo: "/images/green-curry.jpg",
+      plateDiameterCm: 24,
+      tags: ["Vegan", "Spicy"],
+      isAvailable: false,
+    },
+    {
+      id: "tiramisu",
+      name: "Tiramisu",
+      description:
+        "Espresso-soaked ladyfingers, mascarpone cream and cocoa.",
+      price: 10,
+      category: "desserts",
+      photo: "/images/tiramisu.jpg",
+      glbUrl: "/models/tiramisu.glb",
+      plateDiameterCm: 20,
+      tags: ["Vegetarian"],
+      isAvailable: true,
+    },
+    {
+      id: "lemon-sorbet",
+      name: "Lemon Sorbet",
+      description: "Bright, refreshing and dairy-free. Two scoops.",
+      price: 8,
+      category: "desserts",
+      photo: "/images/lemon-sorbet.jpg",
+      plateDiameterCm: 16,
+      tags: ["Vegan", "Gluten-free"],
+      isAvailable: true,
+    },
+  ],
+};
+
+const restaurants: Restaurant[] = [demoBistro];
+
+export function getRestaurants(): Restaurant[] {
+  return restaurants;
+}
+
+export function getRestaurant(slug: string): Restaurant | undefined {
+  return restaurants.find((r) => r.slug === slug);
+}
+
+export function getDish(
+  restaurant: Restaurant,
+  dishId: string,
+): Dish | undefined {
+  return restaurant.dishes.find((d) => d.id === dishId);
+}
