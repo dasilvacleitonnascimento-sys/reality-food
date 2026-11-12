@@ -14,6 +14,11 @@ export function formatPlateSize(cm: number): string {
   return `${cm} cm (${(cm / 2.54).toFixed(1)} in)`;
 }
 
+/** e.g. 8.8 -> "8.8 cm (3.5 in)" */
+export function formatLength(cm: number): string {
+  return `${cm} cm (${(cm / 2.54).toFixed(1)} in)`;
+}
+
 /** Reads ?table= and returns a short, safe label, or null. */
 export function parseTableLabel(value: string | null): string | null {
   if (!value) return null;

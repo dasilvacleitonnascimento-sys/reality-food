@@ -26,7 +26,8 @@ const en = {
   dish: {
     back: "Menu",
     model3d: (dish: string) => `3D model of ${dish}`,
-    servedOn: (size: string) => `Served on a ${size} plate`,
+    servedOn: (size: string) => `Plate size: ${size}`,
+    portion: (w: string, d: string, h: string) => `Portion: ${w} wide · ${d} deep · ${h} tall`,
   },
   viewer: {
     viewOnTable: "View on your table",
@@ -84,7 +85,8 @@ const es: Dictionary = {
   dish: {
     back: "Menú",
     model3d: (dish) => `Modelo 3D de ${dish}`,
-    servedOn: (size) => `Se sirve en un plato de ${size}`,
+    servedOn: (size) => `Tamaño del plato: ${size}`,
+    portion: (w, d, h) => `Porción: ${w} de ancho · ${d} de fondo · ${h} de alto`,
   },
   viewer: {
     viewOnTable: "Ver en tu mesa",

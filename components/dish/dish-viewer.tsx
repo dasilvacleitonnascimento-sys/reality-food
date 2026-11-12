@@ -172,7 +172,8 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
         camera-controls
         touch-action="pan-y"
         shadow-intensity="1"
-        className="relative block aspect-square w-full bg-muted"
+        // h-auto: model-viewer sets height: 150px by default, which would beat aspect-square.
+        className="relative block aspect-square h-auto w-full bg-muted"
       >
         {isLoading && (
           <div

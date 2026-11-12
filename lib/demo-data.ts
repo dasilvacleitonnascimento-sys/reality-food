@@ -21,6 +21,12 @@ export type Dish = {
   /** Optional iOS model. If missing, model-viewer generates USDZ on the fly. */
   usdzUrl?: string;
   plateDiameterCm: number;
+  /**
+   * Size of the food itself (not the plate), in cm: width (side to side as
+   * served), depth (front to back) and height. Checked against the 3D model
+   * by `npm run check-models` and shown to diners so they can compare.
+   */
+  portionCm?: { width: number; depth: number; height: number };
   tags: string[];
   isAvailable: boolean;
 };
@@ -110,6 +116,20 @@ export const demoBistro: Restaurant = {
       tags: ["Vegetarian", "Gluten-free", "To share"],
       isAvailable: true,
     },
+    {
+      id: "pudim-slice",
+      name: "Pudim Slice",
+      description:
+        "One generous slice of our silky condensed-milk flan, with golden caramel sauce.",
+      price: 9,
+      category: "desserts",
+      photo: "/images/pudim-slice.jpg",
+      glbUrl: "/models/pudim-slice.glb",
+      plateDiameterCm: 18,
+      portionCm: { width: 8.8, depth: 7.8, height: 6.2 },
+      tags: ["Vegetarian", "Gluten-free"],
+      isAvailable: true,
+    },
   ],
   translations: {
     es: {
@@ -130,6 +150,10 @@ export const demoBistro: Restaurant = {
           name: "Pastel triple chocolate",
           description:
             "Capas de bizcocho de chocolate oscuro y ganache de chocolate con leche, con crema batida y frambuesas frescas.",
+        },
+        "pudim-slice": {
+          name: "Rebanada de pudim",
+          description: "Una rebanada generosa de nuestro flan sedoso de leche condensada, con salsa de caramelo dorado.",
         },
         pudim: {
           name: "Pudim (flan brasileño)",

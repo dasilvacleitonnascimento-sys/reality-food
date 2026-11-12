@@ -9,7 +9,7 @@ import { LanguageSwitch } from "@/components/menu/language-switch";
 import { DishSkeleton } from "@/components/menu/skeletons";
 import { Badge } from "@/components/ui/badge";
 import { getDish, getRestaurant, getRestaurants } from "@/lib/demo-data";
-import { formatPlateSize, formatPrice } from "@/lib/format";
+import { formatLength, formatPlateSize, formatPrice } from "@/lib/format";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary, getViewerText } from "@/lib/i18n/dictionaries";
 
@@ -99,7 +99,16 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
         )}
 
         <p className="mt-3 text-muted-foreground">{dish.description}</p>
-        <p className="mt-4 text-sm">{t.dish.servedOn(plateSize)}</p>
+        {dish.portionCm && (
+          <p className="mt-4 text-sm font-medium">
+            {t.dish.portion(
+              formatLength(dish.portionCm.width),
+              formatLength(dish.portionCm.depth),
+              formatLength(dish.portionCm.height),
+            )}
+          </p>
+        )}
+        <p className={dish.portionCm ? "mt-1 text-sm" : "mt-4 text-sm"}>{t.dish.servedOn(plateSize)}</p>
       </article>
     </main>
   );

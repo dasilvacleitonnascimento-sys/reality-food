@@ -270,7 +270,8 @@ export function disc(radius, opts = {}) {
  * stated radius); extra rows are spread over segments by length.
  */
 export function lathe(profile, opts = {}) {
-  const { nu = 96, nv = 64, ...rest } = opts;
+  // theta0/thetaLength: sweep only part of the circle (e.g. a slice).
+  const { nu = 96, nv = 64, theta0 = 0, thetaLength = TAU, ...rest } = opts;
   const segs = profile.length - 1;
   const lens = [];
   for (let i = 1; i < profile.length; i++) {
@@ -295,7 +296,7 @@ export function lathe(profile, opts = {}) {
     nu,
     rows,
     (u, v) => {
-      const th = u * TAU;
+      const th = theta0 + u * thetaLength;
       const [r, y] = points[Math.round(v * rows)];
       return [r * Math.cos(th), y, r * Math.sin(th)];
     },

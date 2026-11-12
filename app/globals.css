@@ -156,5 +156,5 @@ model-viewer::part(default-ar-button) {
 
 /* The photo shown while the 3D model loads fills the square viewer. */
 model-viewer::part(default-poster) {
-  background-size: cover;
+  background-size: cover !important;
 }
