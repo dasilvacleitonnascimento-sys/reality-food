@@ -24,8 +24,8 @@ export async function generateMetadata(props: LayoutProps<"/[lang]">): Promise<M
   if (!isLocale(lang)) return {};
   return {
     title: {
-      default: "Plate3D",
-      template: "%s | Plate3D",
+      default: "Reality Food",
+      template: "%s | Reality Food",
     },
     description: getDictionary(lang).site.description,
   };

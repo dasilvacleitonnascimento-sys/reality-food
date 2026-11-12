@@ -1,4 +1,4 @@
-# Plate3D brand guide
+# Reality Food brand guide
 
 Visual board: open `docs/brand/index.html` in a browser.
 
@@ -39,7 +39,7 @@ Visual board: open `docs/brand/index.html` in a browser.
 Rules:
 - Paprika is never used for small text on light backgrounds (3.3:1). Use Paprika Deep instead.
 - Roughly 70% Porcelain/Linen, 20% Espresso, 10% Paprika + Saffron. The accent is a garnish, not the meal.
-- Diner menus use each restaurant's own brand color. Plate3D colors appear on the landing page, the owner dashboard, the admin and sales material.
+- Diner menus use each restaurant's own brand color. Reality Food colors appear on the landing page, the owner dashboard, the admin and sales material.
 
 ## Typography
 
@@ -50,7 +50,7 @@ Rules:
 ## Logo
 
 - Mark: a plate on a table, in perspective, framed by AR scan corners. It reads as "a dish, seen through the camera".
-- Files: `plate3d-mark.svg` (app icon, favicon), `plate3d-logo.svg` (light backgrounds), `plate3d-logo-dark.svg` (Espresso backgrounds).
+- Files: `reality-food-mark.svg` (app icon, favicon), `reality-food-logo.svg` (light backgrounds), `reality-food-logo-dark.svg` (Espresso backgrounds).
 - Minimum size: mark 24px, full logo 120px wide. Clear space: the height of the plate ellipse on every side.
 - The wordmark is live text set in Fraunces. Outline it (convert to paths) before print or merch.
 - Don't recolor the plate, rotate the mark, or put it on photos without an Espresso or Porcelain backing.

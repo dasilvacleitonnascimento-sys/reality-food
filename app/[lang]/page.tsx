@@ -11,7 +11,7 @@ export default async function Home(props: PageProps<"/[lang]">) {
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-4 px-4 py-24 text-center">
-      <h1 className="text-3xl font-semibold tracking-tight">Plate3D</h1>
+      <h1 className="text-3xl font-semibold tracking-tight">Reality Food</h1>
       <p className="text-muted-foreground">{t.tagline}</p>
       <Link
         href="/demo-bistro"

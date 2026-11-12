@@ -18,7 +18,7 @@ type Props = {
 type ArStatus = "not-presenting" | "session-started" | "object-placed" | "failed";
 type ActiveStatus = Exclude<FollowArStatus, "ended">;
 
-const GUIDE_SEEN_KEY = "plate3d-ar-guide-seen";
+const GUIDE_SEEN_KEY = "rf-ar-guide-seen";
 
 function guideSeen() {
   try {

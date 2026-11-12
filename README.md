@@ -1,4 +1,4 @@
-# Plate3D
+# Reality Food
 
 AR menus for restaurants. Diners scan a QR code, open the menu in their phone browser and view dishes as true-to-scale 3D models on their table.
 

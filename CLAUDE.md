@@ -1,7 +1,7 @@
-# Plate3D — AR Menu Platform
+# Reality Food — AR Menu Platform
 
 ## Product
-Plate3D is a multi-tenant SaaS for restaurants. Each restaurant gets a public menu at /[restaurant-slug]. Diners scan a QR code on the table, the menu opens in the phone browser (no app download, no login), and they can tap "View on table" to see a dish as a true-to-scale 3D model in augmented reality on their table.
+Reality Food is a multi-tenant SaaS for restaurants. Each restaurant gets a public menu at /[restaurant-slug]. Diners scan a QR code on the table, the menu opens in the phone browser (no app download, no login), and they can tap "View on table" to see a dish as a true-to-scale 3D model in augmented reality on their table.
 
 ## Users
 1. Diner: anonymous, on a phone, often on weak restaurant Wi-Fi. Must go from QR scan to menu in under 3 seconds.
@@ -43,5 +43,5 @@ The entire product UI is English only. All copy, labels, emails and errors are i
 - Never commit secrets. Keep secrets in .env.local and list required variables in .env.example.
 
 ## Brand
-- Plate3D's own brand (landing page, owner dashboard, admin, sales material) follows docs/brand/BRAND.md: colors, fonts (Fraunces + Manrope), logo files and voice.
-- Diner menus use each restaurant's own brand color, not Plate3D's.
+- Reality Food's own brand (landing page, owner dashboard, admin, sales material) follows docs/brand/BRAND.md: colors, fonts (Fraunces + Manrope), logo files and voice.
+- Diner menus use each restaurant's own brand color, not Reality Food's.

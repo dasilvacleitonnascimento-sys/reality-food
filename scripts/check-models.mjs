@@ -1,6 +1,6 @@
 // True-size check for every dish model.
 //
-// Plate3D promises "true size", so every .glb must match the plate diameter
+// Reality Food promises "true size", so every .glb must match the plate diameter
 // stored for the dish, sit exactly on the table, and stay small enough for
 // restaurant Wi-Fi. Fails (exit code 1) if any model is off.
 //

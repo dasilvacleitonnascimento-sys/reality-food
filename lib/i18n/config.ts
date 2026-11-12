@@ -5,7 +5,7 @@ export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
 
 /** Remembers the diner's choice from the EN/ES switch. */
-export const LOCALE_COOKIE = "plate3d-lang";
+export const LOCALE_COOKIE = "rf-lang";
 
 export function isLocale(value: string | undefined | null): value is Locale {
   return LOCALES.includes(value as Locale);
