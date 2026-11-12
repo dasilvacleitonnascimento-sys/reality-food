@@ -4,13 +4,13 @@
 
 import sharp from "sharp";
 import { Document, NodeIO } from "@gltf-transform/core";
-import { KHRDracoMeshCompression } from "@gltf-transform/extensions";
+import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 import { draco } from "@gltf-transform/functions";
 import draco3d from "draco3dgltf";
 
-/** NodeIO that can read and write Draco-compressed meshes. */
+/** NodeIO that reads/writes every standard glTF extension, including Draco. */
 export async function createIO() {
-  return new NodeIO().registerExtensions([KHRDracoMeshCompression]).registerDependencies({
+  return new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
     "draco3d.encoder": await draco3d.createEncoderModule(),
     "draco3d.decoder": await draco3d.createDecoderModule(),
   });

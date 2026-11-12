@@ -12,15 +12,21 @@ type Props = {
 /** One-time tips before the camera opens, so diners don't get stuck on "Move iPhone to start". */
 export function ArGuide({ text, onOpen, onCancel }: Props) {
   const openRef = useRef<HTMLButtonElement>(null);
+  const cancelRef = useRef(onCancel);
 
+  useEffect(() => {
+    cancelRef.current = onCancel;
+  }, [onCancel]);
+
+  // Focus the main action once when the guide opens.
   useEffect(() => {
     openRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
+      if (e.key === "Escape") cancelRef.current();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onCancel]);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/50 p-4 sm:items-center">

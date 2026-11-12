@@ -26,12 +26,10 @@ import { mkdir, stat } from "node:fs/promises";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { getBounds } from "@gltf-transform/core";
-import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 import { dedup, draco, flatten, join, prune, simplify, textureCompress, weld } from "@gltf-transform/functions";
 import { MeshoptSimplifier } from "meshoptimizer";
-import draco3d from "draco3dgltf";
 import sharp from "sharp";
-import { NodeIO } from "@gltf-transform/core";
+import { createIO } from "./demo/export.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const { values, positionals } = parseArgs({
@@ -53,10 +51,7 @@ if (!input || !plateCm || !values.out) {
   process.exit(1);
 }
 
-const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
-  "draco3d.encoder": await draco3d.createEncoderModule(),
-  "draco3d.decoder": await draco3d.createDecoderModule(),
-});
+const io = await createIO();
 
 const doc = await io.read(input);
 const scene = doc.getRoot().getDefaultScene() ?? doc.getRoot().listScenes()[0];

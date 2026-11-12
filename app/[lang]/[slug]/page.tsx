@@ -68,8 +68,8 @@ async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] 
                 <DishCard
                   key={dish.id}
                   dish={dish}
-                  // Locale-free link: the proxy keeps the diner's language.
-                  href={`/${restaurant.slug}/dish/${dish.id}`}
+                  // Keeps the diner's language even if cookies are blocked.
+                  href={`/${lang}/${restaurant.slug}/dish/${dish.id}`}
                   soldOutLabel={t.soldOut}
                   sizeLabel={dict.dish.sizeShort(dish.servedIn?.kind ?? "plate", formatPlateSize(dish.plateDiameterCm).split(" (")[0], dish.servedIn?.oz)}
                   preloadPhoto={categoryIndex === 0 && dishIndex < 2}

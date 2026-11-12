@@ -17,10 +17,13 @@ export function pickLocale(cookie: string | undefined, acceptLanguage: string | 
   const preferred = (acceptLanguage ?? "")
     .split(",")
     .map((part) => {
-      const [tag, q] = part.trim().split(";q=");
-      return { lang: tag.toLowerCase().slice(0, 2), q: q ? Number(q) : 1 };
+      const [tag, ...params] = part.split(";").map((x) => x.trim());
+      const qParam = params.find((p) => /^qs*=/i.test(p));
+      const q = qParam ? Number(qParam.split("=")[1]) : 1;
+      return { lang: tag.toLowerCase().slice(0, 2), q };
     })
-    .filter((p) => p.lang && !Number.isNaN(p.q))
+    // q=0 means "not acceptable".
+    .filter((p) => p.lang && Number.isFinite(p.q) && p.q > 0)
     .sort((a, b) => b.q - a.q);
   for (const { lang } of preferred) {
     if (isLocale(lang)) return lang;

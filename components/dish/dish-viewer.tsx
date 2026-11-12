@@ -128,8 +128,13 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
         overlay,
         onStatus: (status) => setFollowStatus(status === "ended" ? null : status),
       });
-    } catch {
+    } catch (error) {
       setFollowStatus(null);
+      // Closing AR while it loads isn't a failure.
+      if (error instanceof Error && error.name === "ArCancelledError") return;
+      // Our WebXR mode failed on this phone: fall back to the system AR viewer
+      // (Scene Viewer) on the next tap.
+      setFollowSupported(false);
       setArFailed(true);
     }
   };

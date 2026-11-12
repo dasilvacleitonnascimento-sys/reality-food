@@ -58,7 +58,7 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
       style={{ "--brand": restaurant.primaryColor } as CSSProperties}
     >
       <div className="flex items-center justify-between px-2 py-2">
-        <BackButton fallbackHref={`/${restaurant.slug}`} label={t.dish.back} />
+        <BackButton fallbackHref={`/${lang}/${restaurant.slug}`} label={t.dish.back} />
         <LanguageSwitch current={lang} label={t.menu.language} />
       </div>
 

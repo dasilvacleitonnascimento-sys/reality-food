@@ -21,6 +21,14 @@ export type FollowArStatus =
   | "placed" // dish pinned to the table
   | "ended";
 
+/** Thrown when the diner closes AR before it finished starting (not a failure). */
+export class ArCancelledError extends Error {
+  constructor() {
+    super("AR was closed before it started");
+    this.name = "ArCancelledError";
+  }
+}
+
 export type FollowArSession = {
   /** Plate width measured from the model, in cm. */
   plateWidthCm: number;
@@ -138,17 +146,50 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
   shadowCatcher.receiveShadow = true;
   dish.add(shadowCatcher);
 
+  const draco = new DRACOLoader().setDecoderPath("/draco/");
+  let hitSource: XRHitTestSource | undefined;
+  let anchor: XRAnchor | null = null;
+  let ended = false;
+  let cleaned = false;
+
+  /** Frees everything this session created (GPU memory, Draco workers, anchors). Safe to call twice. */
   const cleanup = () => {
+    if (cleaned) return;
+    cleaned = true;
     renderer.setAnimationLoop(null);
+    hitSource?.cancel();
+    anchor?.delete();
+    anchor = null;
+    scene.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.geometry.dispose();
+      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        for (const value of Object.values(material)) {
+          if (value instanceof THREE.Texture) value.dispose();
+        }
+        material.dispose();
+      }
+    });
+    scene.environment?.dispose();
+    draco.dispose();
     pmrem.dispose();
     renderer.dispose();
   };
 
+  // Registered right away: the diner can press Back while the model is still loading.
+  session.addEventListener("end", () => {
+    ended = true;
+    cleanup();
+    onStatus("ended");
+  });
+
   let plateWidth = 0;
   let ruler: THREE.Mesh | null = null;
   try {
-    const loader = new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath("/draco/"));
+    const loader = new GLTFLoader().setDRACOLoader(draco);
     const gltf = await loader.loadAsync(glbUrl);
+    if (ended) throw new ArCancelledError();
     gltf.scene.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         obj.castShadow = true;
@@ -163,20 +204,18 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
     dish.add(ruler);
 
     await renderer.xr.setSession(session);
+
+    const viewerSpace = await session.requestReferenceSpace("viewer");
+    // The default ray points straight out of the middle of the screen.
+    hitSource = await session.requestHitTestSource?.({ space: viewerSpace });
+    if (!hitSource) throw new Error("Hit testing is not available");
   } catch (error) {
     cleanup();
+    if (ended) throw new ArCancelledError();
     await session.end().catch(() => {});
     throw error;
   }
-
-  const viewerSpace = await session.requestReferenceSpace("viewer");
-  // The default ray points straight out of the middle of the screen.
-  const hitSource = await session.requestHitTestSource?.({ space: viewerSpace });
-  if (!hitSource) {
-    cleanup();
-    await session.end().catch(() => {});
-    throw new Error("Hit testing is not available");
-  }
+  const hits = hitSource;
 
   let status: FollowArStatus = "searching";
   const setStatus = (next: FollowArStatus) => {
@@ -190,7 +229,8 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
   let placed = false;
   let onTable = false;
   let wantAnchor = false;
-  let anchor: XRAnchor | null = null;
+  // Each Place gets a new id, so a slow anchor from an earlier Place is thrown away.
+  let anchorRequest = 0;
   const target = new THREE.Vector3();
   const camPos = new THREE.Vector3();
   const camDir = new THREE.Vector3();
@@ -205,7 +245,7 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
 
     if (frame && refSpace) {
       if (!placed) {
-        for (const hit of frame.getHitTestResults(hitSource)) {
+        for (const hit of frame.getHitTestResults(hits)) {
           const pose = hit.getPose(refSpace);
           if (!pose) continue;
           tmp.fromArray(pose.transform.matrix);
@@ -239,6 +279,7 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
       // Pin the placed dish with an anchor (created inside a frame, as WebXR requires).
       if (placed && wantAnchor && frame.createAnchor) {
         wantAnchor = false;
+        const request = anchorRequest;
         const transform = new XRRigidTransform(
           { x: dish.position.x, y: dish.position.y, z: dish.position.z },
           { x: 0, y: 0, z: 0, w: 1 },
@@ -246,8 +287,12 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
         frame
           .createAnchor(transform, refSpace)
           ?.then((created) => {
-            if (placed) anchor = created;
-            else created.delete();
+            if (placed && request === anchorRequest && !cleaned) {
+              anchor?.delete();
+              anchor = created;
+            } else {
+              created.delete();
+            }
           })
           .catch(() => {});
       }
@@ -268,19 +313,13 @@ export async function startFollowAr({ glbUrl, overlay, onStatus }: Options): Pro
     renderer.render(scene, camera);
   });
 
-  session.addEventListener("end", () => {
-    hitSource.cancel();
-    anchor?.delete();
-    cleanup();
-    onStatus("ended");
-  });
-
   return {
     plateWidthCm: Math.round(plateWidth * 1000) / 10,
     setPlaced(value) {
       // Only pin the dish once it is really on the table.
       if (value && !onTable) return;
       placed = value;
+      anchorRequest++;
       if (value) {
         wantAnchor = true;
         setStatus("placed");

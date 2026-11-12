@@ -9,7 +9,8 @@ Reality Food is a multi-tenant SaaS for restaurants. Each restaurant gets a publ
 3. Super admin (me, the platform owner): creates restaurants, invites owners, uploads 3D models, generates QR codes, sees all data.
 
 ## Language
-The entire product UI is English only. All copy, labels, emails and errors are in US English.
+- Diner menus: English and Spanish (lib/i18n). The language follows the saved EN/ES choice, then the phone's language, then English. Restaurant content is translated in the restaurant's data.
+- Owner dashboard, admin, emails and errors: US English.
 
 ## Tech stack
 - Next.js (latest stable, App Router) + TypeScript (strict mode)
