@@ -12,6 +12,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { burrata, chocolateCake, shrimpRisotto } from "./demo/dishes.mjs";
 import { bake, writeGlb } from "./demo/export.mjs";
+import { pudim, pudimMenuPhoto } from "./demo/pudim.mjs";
 import { renderPhoto } from "./demo/render.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -32,6 +33,8 @@ const dishes = [
   { id: "chocolate-cake", build: chocolateCake, plateCm: 20, height: 0.035 },
   { id: "burrata", build: burrata, plateCm: 23, height: 0.025 },
   { id: "shrimp-risotto", build: shrimpRisotto, plateCm: 27, height: 0.025 },
+  // Built from a real photo; the menu shows the real photo, the render is a preview.
+  { id: "pudim", build: pudim, plateCm: 31, height: 0.03, menuPhoto: pudimMenuPhoto },
 ];
 
 const only = process.argv[2];
@@ -39,15 +42,18 @@ const only = process.argv[2];
 for (const dish of dishes) {
   if (only && dish.id !== only) continue;
   const started = Date.now();
-  const parts = dish.build();
+  const parts = await dish.build();
   const atlas = bake(parts);
   const bytes = await writeGlb(path.join(modelsDir, `${dish.id}.glb`), dish.id, parts, atlas);
+
+  const photoFile = path.join(imagesDir, `${dish.id}.jpg`);
+  if (dish.menuPhoto) await dish.menuPhoto(photoFile);
 
   const plate = dish.plateCm / 100;
   const distance = plate * 2.05;
   const elevation = (40 * Math.PI) / 180;
   await renderPhoto(parts, atlas, {
-    file: path.join(imagesDir, `${dish.id}.jpg`),
+    file: dish.menuPhoto ? path.join(root, "scripts", "demo", "previews", `${dish.id}.jpg`) : photoFile,
     eye: [distance * Math.cos(elevation) * 0.2, distance * Math.sin(elevation), distance * Math.cos(elevation)],
     target: [0, dish.height, 0],
     extent: plate * 1.1,

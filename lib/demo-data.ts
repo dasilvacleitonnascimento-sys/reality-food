@@ -87,6 +87,19 @@ export const demoBistro: Restaurant = {
       tags: ["Vegetarian"],
       isAvailable: true,
     },
+    {
+      id: "pudim",
+      name: "Pudim (Brazilian Flan)",
+      description:
+        "Silky condensed-milk flan bathed in golden caramel. Whole flan, serves 8.",
+      price: 36,
+      category: "desserts",
+      photo: "/images/pudim.jpg",
+      glbUrl: "/models/pudim.glb",
+      plateDiameterCm: 31,
+      tags: ["Vegetarian", "Gluten-free", "To share"],
+      isAvailable: true,
+    },
   ],
 };
 

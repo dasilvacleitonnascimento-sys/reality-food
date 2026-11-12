@@ -48,6 +48,7 @@ export default async function DishPage(props: PageProps<"/[slug]/dish/[id]">) {
           usdzUrl={dish.usdzUrl}
           poster={dish.photo}
           alt={`3D model of ${dish.name}`}
+          plateDiameterCm={dish.plateDiameterCm}
         />
       ) : (
         <div className="relative aspect-4/3 w-full bg-muted">
