@@ -66,7 +66,7 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
           usdzUrl={dish.usdzUrl}
           poster={dish.photo}
           alt={t.dish.model3d(dish.name)}
-          text={getViewerText(lang, plateSize)}
+          text={getViewerText(lang, t.dish.sizeShort(dish.servedIn?.kind ?? "plate", plateSize, dish.servedIn?.oz))}
         />
       ) : (
         <div className="relative aspect-4/3 w-full bg-muted">
@@ -108,7 +108,11 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
             )}
           </p>
         )}
-        <p className={dish.portionCm ? "mt-1 text-sm" : "mt-4 text-sm"}>{t.dish.servedOn(plateSize)}</p>
+        <p className={dish.portionCm ? "mt-1 text-sm" : "mt-4 text-sm"}>
+          {dish.servedIn
+            ? t.dish.servedIn(dish.servedIn.kind, plateSize, dish.servedIn.oz)
+            : t.dish.servedOn(plateSize)}
+        </p>
       </article>
     </main>
   );

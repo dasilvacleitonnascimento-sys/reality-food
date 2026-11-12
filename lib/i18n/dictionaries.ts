@@ -3,6 +3,8 @@
 
 import type { Locale } from "./config";
 
+type Vessel = "cup" | "glass" | "bowl" | "pan";
+
 const en = {
   site: {
     description: "See every dish on your table in 3D before you order.",
@@ -27,6 +29,16 @@ const en = {
     back: "Menu",
     model3d: (dish: string) => `3D model of ${dish}`,
     servedOn: (size: string) => `Plate size: ${size}`,
+    servedIn: (kind: Vessel, size: string, oz?: number) =>
+      kind === "cup"
+        ? `Cup: ${oz} oz, on a ${size} saucer`
+        : kind === "glass"
+          ? `Glass: ${oz} oz, ${size} wide`
+          : kind === "bowl"
+            ? `Bowl size: ${size}`
+            : `Pan size: ${size}`,
+    sizeShort: (kind: Vessel | "plate", size: string, oz?: number) =>
+      kind === "cup" || kind === "glass" ? `${oz} oz ${kind}` : `${size} ${kind}`,
     portion: (w: string, d: string, h: string) => `Portion: ${w} wide · ${d} deep · ${h} tall`,
   },
   viewer: {
@@ -38,7 +50,7 @@ const en = {
     tapHint: "Tap the button, then point your camera at the table.",
   },
   ar: {
-    trueSize: (size: string) => `True size · ${size} plate`,
+    trueSize: (label: string) => `True size · ${label}`,
     close: "Close AR",
     placeHere: "Place here",
     moveDish: "Move dish",
@@ -86,6 +98,24 @@ const es: Dictionary = {
     back: "Menú",
     model3d: (dish) => `Modelo 3D de ${dish}`,
     servedOn: (size) => `Tamaño del plato: ${size}`,
+    servedIn: (kind, size, oz) =>
+      kind === "cup"
+        ? `Taza: ${oz} oz, sobre platillo de ${size}`
+        : kind === "glass"
+          ? `Vaso: ${oz} oz, ${size} de ancho`
+          : kind === "bowl"
+            ? `Tamaño del bowl: ${size}`
+            : `Tamaño de la sartén: ${size}`,
+    sizeShort: (kind, size, oz) =>
+      kind === "cup"
+        ? `taza de ${oz} oz`
+        : kind === "glass"
+          ? `vaso de ${oz} oz`
+          : kind === "bowl"
+            ? `bowl de ${size}`
+            : kind === "pan"
+              ? `sartén de ${size}`
+              : `plato de ${size}`,
     portion: (w, d, h) => `Porción: ${w} de ancho · ${d} de fondo · ${h} de alto`,
   },
   viewer: {
@@ -97,7 +127,7 @@ const es: Dictionary = {
     tapHint: "Toca el botón y apunta la cámara a la mesa.",
   },
   ar: {
-    trueSize: (size) => `Tamaño real · plato de ${size}`,
+    trueSize: (label) => `Tamaño real · ${label}`,
     close: "Cerrar",
     placeHere: "Colocar aquí",
     moveDish: "Mover plato",
@@ -126,11 +156,11 @@ export function getDictionary(locale: Locale): Dictionary {
 }
 
 /** Plain-string parts of the dictionary that client components need (functions can't cross to the client). */
-export function getViewerText(locale: Locale, plateSize: string) {
+export function getViewerText(locale: Locale, sizeLabel: string) {
   const d = dictionaries[locale];
   return {
     ...d.viewer,
-    trueSize: d.ar.trueSize(plateSize),
+    trueSize: d.ar.trueSize(sizeLabel),
     close: d.ar.close,
     placeHere: d.ar.placeHere,
     moveDish: d.ar.moveDish,

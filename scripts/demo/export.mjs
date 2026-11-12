@@ -23,7 +23,13 @@ export const MATERIALS = {
   glaze: 0.28, // moist custard
   sauce: 0.08, // sauces pooled on the plate (not counted as the portion)
   matte: 0.78,
+  metal: 0.35, // cast iron, cutlery
+  clear: 0.04, // glass and clear plastic cups (see TRANSPARENT)
+  ice: 0.12,
 };
+
+/** Materials that are see-through, with their opacity. */
+export const TRANSPARENT = { clear: 0.18, ice: 0.42 };
 
 const PAD = 2;
 
@@ -121,6 +127,8 @@ export async function writeGlb(file, name, parts, atlas) {
       .createMaterial(matName)
       .setBaseColorTexture(texture)
       .setRoughnessFactor(MATERIALS[matName])
+      .setAlphaMode(TRANSPARENT[matName] ? "BLEND" : "OPAQUE")
+      .setBaseColorFactor([1, 1, 1, TRANSPARENT[matName] ?? 1])
       .setMetallicFactor(0)
       .setDoubleSided(true);
     // No mipmaps: keeps neighboring atlas regions from bleeding into each other.

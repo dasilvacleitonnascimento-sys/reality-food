@@ -1,6 +1,9 @@
 // Day-1 prototype data. Replaced by Supabase in Prompt 2.
 
-export type CategoryId = "starters" | "mains" | "desserts";
+import { ironsideCafe } from "./demo-ironside.ts";
+
+/** Category ids are per restaurant (e.g. "starters", "hot-coffee"). */
+export type CategoryId = string;
 
 export type Category = {
   id: CategoryId;
@@ -27,6 +30,8 @@ export type Dish = {
    * by `npm run check-models` and shown to diners so they can compare.
    */
   portionCm?: { width: number; depth: number; height: number };
+  /** Drinks and bowls: what it's served in. Plates are the default. */
+  servedIn?: { kind: "cup" | "glass" | "bowl" | "pan"; oz?: number };
   tags: string[];
   isAvailable: boolean;
 };
@@ -171,7 +176,7 @@ export const demoBistro: Restaurant = {
   },
 };
 
-const restaurants: Restaurant[] = [demoBistro];
+const restaurants: Restaurant[] = [demoBistro, ironsideCafe];
 
 export function getRestaurants(): Restaurant[] {
   return restaurants;

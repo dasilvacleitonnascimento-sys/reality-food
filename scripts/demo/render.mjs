@@ -3,7 +3,7 @@
 
 import sharp from "sharp";
 import { fbm } from "./geometry.mjs";
-import { MATERIALS } from "./export.mjs";
+import { MATERIALS, TRANSPARENT } from "./export.mjs";
 
 const norm = (v) => {
   const l = Math.hypot(v[0], v[1], v[2]) || 1;
@@ -65,9 +65,11 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
     UV: part.uv,
     idx: part.indices(),
     rough: MATERIALS[part.material],
+    alpha: TRANSPARENT[part.material],
   }));
 
-  for (const { P, idx } of meshes) {
+  // See-through parts (glass) don't block the light.
+  for (const { P, idx } of meshes.filter((m) => !m.alpha)) {
     const proj = [];
     for (let i = 0; i < P.length; i += 3) proj.push(toShadow([P[i], P[i + 1], P[i + 2]]));
     for (let t = 0; t < idx.length; t += 3) {
@@ -157,7 +159,9 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
   };
 
   // --- Dish -------------------------------------------------------------------
-  for (const { P, N, UV, idx, rough } of meshes) {
+  // Opaque first, then glass blended on top (no depth writes) so drinks show through.
+  const ordered = [...meshes.filter((m) => !m.alpha), ...meshes.filter((m) => m.alpha)];
+  for (const { P, N, UV, idx, rough, alpha } of ordered) {
     const view = [];
     for (let i = 0; i < P.length; i += 3) {
       const v = toView([P[i], P[i + 1], P[i + 2]]);
@@ -179,7 +183,7 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
         const z = 1 / iz;
         const o = py * W + px;
         if (z >= depth[o]) return;
-        depth[o] = z;
+        if (!alpha) depth[o] = z;
         const k0 = q0 / iz;
         const k1 = q1 / iz;
         const k2 = q2 / iz;
@@ -187,7 +191,15 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
         const p = [lerp3(P, 3, 0), lerp3(P, 3, 1), lerp3(P, 3, 2)];
         const n = norm([lerp3(N, 3, 0), lerp3(N, 3, 1), lerp3(N, 3, 2)]);
         const albedo = sampleAtlas(lerp3(UV, 2, 0), lerp3(UV, 2, 1));
-        color.set(shade(p, n, albedo, rough), o * 3);
+        const lit = shade(p, n, albedo, rough);
+        if (!alpha) {
+          color.set(lit, o * 3);
+          return;
+        }
+        // Glass mostly reflects: faint in the middle, brighter at grazing angles (Fresnel).
+        const V = norm([eye[0] - p[0], eye[1] - p[1], eye[2] - p[2]]);
+        const opacity = Math.min(0.6, alpha * 0.25 + 0.45 * Math.pow(1 - Math.abs(dot(n, V)), 4));
+        for (let ch = 0; ch < 3; ch++) color[o * 3 + ch] = color[o * 3 + ch] * (1 - opacity) + lit[ch] * opacity;
       });
     }
   }
