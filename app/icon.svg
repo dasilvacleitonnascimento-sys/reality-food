@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Reality Food">
-  <!-- AR scan corners (Lens) -->
-  <path d="M7 19V12a5 5 0 0 1 5-5h7M45 7h7a5 5 0 0 1 5 5v7M57 45v7a5 5 0 0 1-5 5h-7M19 57h-7a5 5 0 0 1-5-5v-7" fill="none" stroke="#0B7A70" stroke-width="4" stroke-linecap="round"/>
-  <!-- The dish on its plate, in perspective (Tomato) -->
-  <ellipse cx="32" cy="32" rx="18" ry="10.5" fill="#E5483A"/>
-  <ellipse cx="32" cy="32" rx="11" ry="6.2" fill="none" stroke="#FAF7F1" stroke-width="2"/>
-  <ellipse cx="32" cy="28.5" rx="6.5" ry="5.5" fill="#F4B63E"/>
-  <!-- True-size dimension line -->
-  <path d="M14 49h36M14 46v6M50 46v6" fill="none" stroke="#0B7A70" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- RF monogram on a Tomato plate. Letters are paths: no font needed. -->
+  <circle cx="32" cy="32" r="29" fill="#E5483A"/>
+  <circle cx="32" cy="32" r="23.6" fill="none" stroke="#FAF7F1" stroke-width="1.5" opacity="0.5"/>
+  <g fill="none" stroke="#FAF7F1" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.6 0)">
+    <path d="M17.6 44.5V19.5h8.9a6.45 6.45 0 0 1 0 12.9h-8.9M25.9 32.4l5.4 12.1"/>
+    <path d="M37.4 44.5V19.5h10.2M37.4 31.6h8.4"/>
+  </g>
 </svg>

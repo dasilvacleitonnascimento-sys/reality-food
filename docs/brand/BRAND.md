@@ -55,9 +55,9 @@ Rules:
 
 ## Logo
 
-- Mark: a plate in perspective framed by AR scan corners, with a dimension line underneath — "a real dish, seen through the camera, at its real size".
-- Files: `reality-food-mark.svg` (app icon; also `app/icon.svg`), `reality-food-logo.svg` (light backgrounds), `reality-food-logo-dark.svg` (Ink backgrounds; uses Lens Light).
-- Minimum size: mark 24px, full logo 140px wide. Clear space: the height of the plate ellipse on every side.
+- Mark: the **RF monogram** — the letters R and F drawn in Cream on a round Tomato plate, with a faint plate rim. Letters are drawn as paths (no font needed), so the mark looks identical everywhere: app icon, table stickers, QR cards, merch.
+- Files: `reality-food-mark.svg` (app icon; also `app/icon.svg`), `reality-food-logo.svg` (light backgrounds), `reality-food-logo-dark.svg` (Ink backgrounds).
+- Minimum size: mark 20px, full logo 140px wide. Clear space: half the plate's radius on every side.
 - The wordmark is live text in Fraunces. Outline it (convert to paths) before print or merch.
 - Don't recolor the plate, rotate the mark, or place it on photos without an Ink or Cream backing.
 

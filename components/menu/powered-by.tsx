@@ -9,9 +9,11 @@ export function PoweredBy({ label }: { label: string }) {
         className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <svg viewBox="0 0 64 64" className="size-5" aria-hidden>
-          <path d="M7 19V12a5 5 0 0 1 5-5h7M45 7h7a5 5 0 0 1 5 5v7M57 45v7a5 5 0 0 1-5 5h-7M19 57h-7a5 5 0 0 1-5-5v-7" fill="none" stroke="#0B7A70" strokeWidth="5" strokeLinecap="round" />
-          <ellipse cx="32" cy="32" rx="18" ry="10.5" fill="#E5483A" />
-          <ellipse cx="32" cy="28.5" rx="6.5" ry="5.5" fill="#F4B63E" />
+          <circle cx="32" cy="32" r="29" fill="#E5483A" />
+          <g fill="none" stroke="#FAF7F1" strokeWidth="5.4" strokeLinecap="round" strokeLinejoin="round" transform="translate(-0.6 0)">
+            <path d="M17.6 44.5V19.5h8.9a6.45 6.45 0 0 1 0 12.9h-8.9M25.9 32.4l5.4 12.1" />
+            <path d="M37.4 44.5V19.5h10.2M37.4 31.6h8.4" />
+          </g>
         </svg>
         {label}
       </Link>

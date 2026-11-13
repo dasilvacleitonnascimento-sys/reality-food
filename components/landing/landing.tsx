@@ -138,15 +138,16 @@ const serif = "[font-family:var(--font-fraunces),Georgia,serif] font-semibold tr
 const btn =
   "inline-flex h-12 items-center justify-center rounded-xl px-5 text-base font-bold outline-none transition-colors focus-visible:ring-4";
 
-function Mark({ dark = false, className = "" }: { dark?: boolean; className?: string }) {
-  const lens = dark ? C.lensLight : C.lens;
+/** RF monogram on a Tomato plate. */
+function Mark({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden>
-      <path d="M7 19V12a5 5 0 0 1 5-5h7M45 7h7a5 5 0 0 1 5 5v7M57 45v7a5 5 0 0 1-5 5h-7M19 57h-7a5 5 0 0 1-5-5v-7" fill="none" stroke={lens} strokeWidth="4" strokeLinecap="round" />
-      <ellipse cx="32" cy="32" rx="18" ry="10.5" fill={C.tomato} />
-      <ellipse cx="32" cy="32" rx="11" ry="6.2" fill="none" stroke={C.cream} strokeWidth="2" />
-      <ellipse cx="32" cy="28.5" rx="6.5" ry="5.5" fill={C.saffron} />
-      <path d="M14 49h36M14 46v6M50 46v6" fill="none" stroke={lens} strokeWidth="2.4" strokeLinecap="round" />
+      <circle cx="32" cy="32" r="29" fill={C.tomato} />
+      <circle cx="32" cy="32" r="23.6" fill="none" stroke={C.cream} strokeWidth="1.5" opacity="0.5" />
+      <g fill="none" stroke={C.cream} strokeWidth="4.8" strokeLinecap="round" strokeLinejoin="round" transform="translate(-0.6 0)">
+        <path d="M17.6 44.5V19.5h8.9a6.45 6.45 0 0 1 0 12.9h-8.9M25.9 32.4l5.4 12.1" />
+        <path d="M37.4 44.5V19.5h10.2M37.4 31.6h8.4" />
+      </g>
     </svg>
   );
 }
@@ -154,7 +155,7 @@ function Mark({ dark = false, className = "" }: { dark?: boolean; className?: st
 function Wordmark({ dark = false }: { dark?: boolean }) {
   return (
     <span className="flex items-center gap-2.5">
-      <Mark dark={dark} className="size-9" />
+      <Mark className="size-9" />
       <span className={`${serif} text-xl`} style={{ color: dark ? C.cream : C.ink }}>
         Reality <span style={{ color: dark ? C.tomato : C.tomatoDeep }}>Food</span>
       </span>
