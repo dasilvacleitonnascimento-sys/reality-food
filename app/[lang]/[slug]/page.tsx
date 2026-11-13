@@ -7,18 +7,18 @@ import { MenuHeader } from "@/components/menu/menu-header";
 import { MenuSkeleton } from "@/components/menu/skeletons";
 import { PoweredBy } from "@/components/menu/powered-by";
 import { formatPlateSize } from "@/lib/format";
-import { getRestaurant, getRestaurants } from "@/lib/demo-data";
+import { getMenu, getMenuSlugs } from "@/lib/menu";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 
-export function generateStaticParams() {
-  return getRestaurants().map((r) => ({ slug: r.slug }));
+export async function generateStaticParams() {
+  return (await getMenuSlugs()).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata(props: PageProps<"/[lang]/[slug]">): Promise<Metadata> {
   const { lang, slug } = await props.params;
   if (!isLocale(lang)) return {};
-  const restaurant = getRestaurant(slug, lang);
+  const restaurant = await getMenu(slug, lang);
   if (!restaurant) return {};
   return {
     title: getDictionary(lang).menu.title(restaurant.name),
@@ -38,7 +38,7 @@ export default function MenuPage(props: PageProps<"/[lang]/[slug]">) {
 async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] }) {
   const { lang, slug } = await params;
   if (!isLocale(lang)) notFound();
-  const restaurant = getRestaurant(slug, lang);
+  const restaurant = await getMenu(slug, lang);
   if (!restaurant) notFound();
   const dict = getDictionary(lang);
   const t = dict.menu;

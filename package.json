@@ -9,11 +9,13 @@
     "lint": "eslint",
     "demo-assets": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-demo-assets.mjs",
     "check-models": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-models.mjs",
-    "import-model": "node scripts/import-model.mjs"
+    "import-model": "node scripts/import-model.mjs",
+    "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-supabase.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@google/model-viewer": "^4.4.0",
+    "@supabase/supabase-js": "^2.119.0",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.2",
     "lucide-react": "^1.72.0",

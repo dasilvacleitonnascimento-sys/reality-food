@@ -10,19 +10,20 @@ import { PoweredBy } from "@/components/menu/powered-by";
 import { Ruler } from "lucide-react";
 import { DishSkeleton } from "@/components/menu/skeletons";
 import { Badge } from "@/components/ui/badge";
-import { getDish, getRestaurant, getRestaurants } from "@/lib/demo-data";
+import { getDish } from "@/lib/demo-data";
+import { getDishParams, getMenu } from "@/lib/menu";
 import { formatLength, formatPlateSize, formatPrice } from "@/lib/format";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary, getViewerText } from "@/lib/i18n/dictionaries";
 
-export function generateStaticParams() {
-  return getRestaurants().flatMap((r) => r.dishes.map((d) => ({ slug: r.slug, id: d.id })));
+export async function generateStaticParams() {
+  return getDishParams();
 }
 
 export async function generateMetadata(props: PageProps<"/[lang]/[slug]/dish/[id]">): Promise<Metadata> {
   const { lang, slug, id } = await props.params;
   if (!isLocale(lang)) return {};
-  const restaurant = getRestaurant(slug, lang);
+  const restaurant = await getMenu(slug, lang);
   const dish = restaurant && getDish(restaurant, id);
   if (!restaurant || !dish) return {};
   return {
@@ -43,7 +44,7 @@ export default function DishPage(props: PageProps<"/[lang]/[slug]/dish/[id]">) {
 async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">["params"] }) {
   const { lang, slug, id } = await params;
   if (!isLocale(lang)) notFound();
-  const restaurant = getRestaurant(slug, lang);
+  const restaurant = await getMenu(slug, lang);
   const dish = restaurant && getDish(restaurant, id);
   if (!restaurant || !dish) notFound();
   const t = getDictionary(lang);
