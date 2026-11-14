@@ -11,6 +11,8 @@
 //   --flip           The dish came out upside down.
 //   --max-tris <n>   Triangle budget (default 150000).
 //   --texture <px>   Max texture size (default 2048).
+//   --no-enhance     Keep the scan's raw colors (default: white balance from the
+//                    plate, gentle contrast and +10% saturation).
 //
 // What it does
 //   1. Levels the model and sets the plate's widest point to exactly --plate cm
@@ -30,6 +32,7 @@ import { dedup, draco, flatten, join, prune, simplify, textureCompress, weld } f
 import { MeshoptSimplifier } from "meshoptimizer";
 import sharp from "sharp";
 import { createIO } from "./demo/export.mjs";
+import { enhanceTextures } from "./demo/scan-cleanup.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const { values, positionals } = parseArgs({
@@ -41,6 +44,7 @@ const { values, positionals } = parseArgs({
     flip: { type: "boolean", default: false },
     "max-tris": { type: "string", default: "150000" },
     texture: { type: "string", default: "2048" },
+    "no-enhance": { type: "boolean", default: false },
   },
 });
 
@@ -111,6 +115,9 @@ const tris = countTris();
 if (tris > maxTris) {
   await MeshoptSimplifier.ready;
   await doc.transform(simplify({ simplifier: MeshoptSimplifier, ratio: maxTris / tris, error: 0.0005 }));
+}
+if (!values["no-enhance"]) {
+  for (const note of await enhanceTextures(doc)) console.log(`Color: ${note}`);
 }
 const px = Number(values.texture);
 await doc.transform(

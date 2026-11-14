@@ -21,6 +21,7 @@ import { compactPrimitive, prune } from "@gltf-transform/functions";
 import { MATERIALS, bake, createIO } from "./demo/export.mjs";
 import { plate as makePlate } from "./demo/ironside.mjs";
 import { readObj } from "./demo/obj.mjs";
+import { removeIslands } from "./demo/scan-cleanup.mjs";
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -134,6 +135,9 @@ for (const prim of prims) {
   idxAcc.setArray(idx instanceof Uint32Array ? new Uint32Array(keep) : new Uint16Array(keep));
   compactPrimitive(prim);
 }
+const crumbs = removeIslands(doc);
+if (crumbs) console.log(`Removed ${crumbs} triangles of loose crumbs (small disconnected pieces).`);
+
 if (replacePlate) {
   const diameterCm = Number(values["plate-cm"]) || Math.round(radius * 200 * 2) / 2;
   const { part } = makePlate(diameterCm, Math.max(0.004, wellY - tableY));
