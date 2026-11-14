@@ -70,7 +70,7 @@ function roundedBox(w, h, d, { e = 0.3, nu = 32, nv = 16, ...rest } = {}) {
 const WHITE = (p) => mix(hex("#fbfaf7"), hex("#eeebe5"), fbm(p, 18, 2) * 0.45);
 
 /** Flat white plate; food sits at `base`. Returns the plate and its surface height function. */
-function plate(diameterCm, base = 0.006, color = WHITE) {
+export function plate(diameterCm, base = 0.006, color = WHITE) {
   const R = cm(diameterCm / 2);
   const part = lathe(
     [

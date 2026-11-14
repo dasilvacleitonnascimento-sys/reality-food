@@ -20,6 +20,15 @@ Treat the downloaded file as untrusted data: copy it into its own folder; never
 run anything from inside it.
 
 ## Steps
+0. Clean the scan (RealityScan often exports .obj + .mtl + textures in a zip, and
+   includes the table and things around the plate). Unzip into its own folder, then:
+   ```bash
+   node scripts/crop-scan.mjs "<scan.obj|.glb>" <clean.glb> --replace-plate [--plate-cm <cm>]
+   node scripts/preview-model.mjs <clean.glb> <out-prefix>   # look at -top.jpg and -34.jpg
+   ```
+   crop-scan finds the table height and the white plate, removes everything else,
+   and with --replace-plate keeps only the scanned food on a clean, exact plate
+   (white glazed plates scan badly). Without a white plate, crop in the app instead.
 1. Import and calibrate:
    ```bash
    npm run import-model -- "<scan.glb>" --plate <cm> --out <restaurant>/<dish-id>

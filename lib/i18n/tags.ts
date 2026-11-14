@@ -10,6 +10,7 @@ const ES: Record<string, string> = {
   "Chef's pick": "Recomendación del chef",
   "To share": "Para compartir",
   New: "Nuevo",
+  "Real scan": "Escaneo real",
 };
 
 export function translateTag(tag: string, locale: Locale): string {

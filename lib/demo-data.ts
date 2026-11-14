@@ -96,6 +96,19 @@ export const demoBistro: Restaurant = {
       isAvailable: true,
     },
     {
+      id: "schnitzel-plate",
+      name: "Chicken Schnitzel Plate",
+      description:
+        "Crispy breaded chicken with pickled beets, cucumber, slaw and lemon. Scanned from the real dish with a phone.",
+      price: 18,
+      category: "mains",
+      photo: "/images/schnitzel-plate.jpg",
+      glbUrl: "/models/demo-bistro/schnitzel-plate.glb",
+      plateDiameterCm: 26.5,
+      tags: ["Real scan"],
+      isAvailable: true,
+    },
+    {
       id: "chocolate-cake",
       name: "Triple Chocolate Cake",
       description:
@@ -145,6 +158,11 @@ export const demoBistro: Restaurant = {
           name: "Burrata con tomates heirloom",
           description:
             "Burrata cremosa, tomates heirloom y cherry, albahaca fresca, aceite de oliva y sal en escamas.",
+        },
+        "schnitzel-plate": {
+          name: "Plato de schnitzel de pollo",
+          description:
+            "Pollo empanizado crujiente con betabel encurtido, pepino, ensalada de col y limón. Escaneado del plato real con un teléfono.",
         },
         "shrimp-risotto": {
           name: "Risotto de camarones",
