@@ -16,7 +16,7 @@
 
 import { parseArgs } from "node:util";
 import sharp from "sharp";
-import { getBounds } from "@gltf-transform/core";
+
 import { compactPrimitive, prune } from "@gltf-transform/functions";
 import { MATERIALS, bake, createIO } from "./demo/export.mjs";
 import { plate as makePlate } from "./demo/ironside.mjs";
@@ -38,7 +38,7 @@ const scene = doc.getRoot().getDefaultScene() ?? doc.getRoot().listScenes()[0];
 const prims = doc.getRoot().listMeshes().flatMap((m) => m.listPrimitives());
 
 // --- 1. Table height: the mode of vertex heights (2 mm bins) ---------------
-const b = getBounds(scene);
+
 const bin = 0.002;
 const hist = new Map();
 for (const prim of prims) {
