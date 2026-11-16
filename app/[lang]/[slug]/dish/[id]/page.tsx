@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense, type CSSProperties } from "react";
+import { Suspense } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { preload } from "react-dom";
@@ -56,7 +56,6 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
   return (
     <main
       className="mx-auto w-full max-w-xl pb-16"
-      style={{ "--brand": restaurant.primaryColor } as CSSProperties}
     >
       <div className="flex items-center justify-between px-2 py-2">
         <BackButton fallbackHref={`/${lang}/${restaurant.slug}`} label={t.dish.back} />
@@ -102,10 +101,10 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
         )}
 
         <p className="mt-3 text-muted-foreground">{dish.description}</p>
-        <section aria-label={t.dish.sizeHeading} className="mt-5 flex gap-3 rounded-xl border border-[#FBB71A]/60 bg-[#FBB71A]/10 p-4">
-          <Ruler className="mt-0.5 size-5 shrink-0 text-[#8A5A00]" aria-hidden />
+        <section aria-label={t.dish.sizeHeading} className="mt-5 flex gap-3 rounded-xl border border-(--brand)/60 bg-(--brand)/10 p-4">
+          <Ruler className="mt-0.5 size-5 shrink-0 text-(--brand-text)" aria-hidden />
           <div className="text-sm">
-            <p className="font-semibold text-[#8A5A00]">{t.dish.sizeHeading}</p>
+            <p className="font-semibold text-(--brand-text)">{t.dish.sizeHeading}</p>
             {dish.portionCm && (
               <p className="mt-1">
                 {t.dish.portion(

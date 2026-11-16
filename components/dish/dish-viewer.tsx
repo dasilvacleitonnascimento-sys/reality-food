@@ -37,7 +37,7 @@ function markGuideSeen() {
 }
 
 const buttonClass =
-  "h-14 rounded-xl bg-(--brand) text-base font-semibold text-white shadow-lg outline-none focus-visible:ring-4 focus-visible:ring-white/70 disabled:opacity-60";
+  "h-14 rounded-xl bg-(--brand) text-base font-semibold text-(--brand-foreground) shadow-lg outline-none focus-visible:ring-4 focus-visible:ring-white/70 disabled:opacity-60";
 
 export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
   const viewerRef = useRef<HTMLElement>(null);

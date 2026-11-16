@@ -35,8 +35,6 @@ export type RestaurantSite = {
   address: string;
   /** Display format and tel: format. */
   phone: { display: string; tel: string };
-  /** Website palette (the menu keeps using the restaurant's primary color). */
-  colors: { ink: string; paper: string; accent: string; soft: string };
   text: Record<Locale, SiteText>;
 };
 
@@ -47,12 +45,6 @@ const demoBistro: RestaurantSite = {
   // Fictional restaurant: example street and a 555-01xx number reserved for fiction.
   address: "1200 Example Ave, Miami, FL",
   phone: { display: "(305) 555-0142", tel: "+13055550142" },
-  colors: {
-    ink: "#2A1A12",
-    paper: "#FBF6EF",
-    accent: "#9A3412",
-    soft: "#FED7AA",
-  },
   text: {
     en: {
       heroTitle: "Seasonal plates, made from scratch.",

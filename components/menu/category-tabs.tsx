@@ -50,7 +50,7 @@ export function CategoryTabs({ categories, label }: { categories: Category[]; la
                 className={cn(
                   "h-11 rounded-full px-4 text-sm font-medium transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                   isActive
-                    ? "bg-(--brand) text-white"
+                    ? "bg-(--brand) text-(--brand-foreground)"
                     : "bg-muted text-foreground hover:bg-muted/70",
                 )}
               >

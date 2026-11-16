@@ -49,24 +49,41 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* ---- Reality Food palette: the ONE place to change colors (whole app). ----
+     Charcoal / Ivory / Golden Yellow. See docs/brand/BRAND.md. */
+  --rf-ink: #191a1f; /* charcoal: text, dark sections */
+  --rf-panel: #26272e; /* cards on dark sections */
+  --rf-paper: #e7e7e7; /* ivory: page background */
+  --rf-card: #f4f4f5; /* cards on ivory */
+  --rf-muted-bg: #d9d9db; /* chips, placeholders */
+  --rf-line: #d2d2d6; /* borders */
+  --rf-muted: #55565c; /* secondary text (5.9:1 on ivory) */
+  --rf-accent: #fbb71a; /* golden yellow: buttons, highlights */
+  --rf-accent-soft: #ffe3a3; /* light gold: glows, shimmer */
+  --rf-accent-text: #8a5a00; /* dark gold: text/icons on ivory (4.8:1) */
+  /* Buttons and highlights on diner menus. */
+  --brand: var(--rf-accent);
+  --brand-foreground: var(--rf-ink);
+  --brand-text: var(--rf-accent-text);
+
+  --background: var(--rf-paper);
+  --foreground: var(--rf-ink);
+  --card: var(--rf-card);
+  --card-foreground: var(--rf-ink);
+  --popover: var(--rf-card);
+  --popover-foreground: var(--rf-ink);
+  --primary: var(--rf-ink);
+  --primary-foreground: var(--rf-paper);
+  --secondary: var(--rf-muted-bg);
+  --secondary-foreground: var(--rf-ink);
+  --muted: var(--rf-muted-bg);
+  --muted-foreground: var(--rf-muted);
+  --accent: var(--rf-muted-bg);
+  --accent-foreground: var(--rf-ink);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: var(--rf-line);
+  --input: var(--rf-line);
+  --ring: var(--rf-accent-text);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);

@@ -37,7 +37,7 @@ export const ironsideCafe: Restaurant = {
   slug: "ironside-cafe",
   logo: `${IMG}/logo.svg`,
   tagline: "Mediterranean café at Miami Ironside.",
-  primaryColor: "#1f3a33",
+  primaryColor: "#191A1F",
   categories: [
     { id: "all-day", name: "All Day" },
     { id: "sandwiches", name: "Sandwiches" },

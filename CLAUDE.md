@@ -45,4 +45,4 @@ Reality Food is a multi-tenant SaaS for restaurants. Each restaurant gets a publ
 
 ## Brand
 - Reality Food's own brand (landing page, owner dashboard, admin, sales material) follows docs/brand/BRAND.md: colors, fonts (Fraunces + Manrope), logo files and voice.
-- Diner menus use each restaurant's own brand color, not Reality Food's.
+- Everything (landing, diner menus, dish pages, restaurant websites) uses ONE palette: the --rf-* variables at the top of app/globals.css (decided by the user on 2026-11-16). Never hard-code colors in components; use those variables.

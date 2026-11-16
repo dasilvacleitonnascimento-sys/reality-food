@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense, type CSSProperties } from "react";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { CategoryTabs } from "@/components/menu/category-tabs";
 import { DishCard } from "@/components/menu/dish-card";
@@ -46,7 +46,6 @@ async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] 
   return (
     <main
       className="mx-auto w-full max-w-xl pb-16"
-      style={{ "--brand": restaurant.primaryColor } as CSSProperties}
     >
       <MenuHeader restaurant={restaurant} locale={lang} text={{ table: t.table, language: t.language }} />
       <CategoryTabs categories={restaurant.categories} label={t.categories} />

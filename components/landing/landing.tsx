@@ -19,7 +19,6 @@ import { getRestaurant } from "@/lib/demo-data";
 import { LanguageSwitch } from "@/components/menu/language-switch";
 import { CountUp } from "./count-up";
 import { HeroStage, type StageDish } from "./hero-stage";
-import { paletteVars } from "./palette";
 import { Reveal } from "./reveal";
 import { SizeCompare } from "./size-compare";
 
@@ -61,17 +60,6 @@ const COPY = {
       },
     },
     marquee: "Dishes already in 3D",
-    stats: [
-      {
-        to: 0.5,
-        decimals: 1,
-        suffix: "%",
-        label: "max size error on every model",
-      },
-      { to: 3, suffix: " s", label: "from QR scan to menu" },
-      { to: 2, label: "languages, picked automatically" },
-      { to: 0, label: "apps to download" },
-    ],
     how: {
       eyebrow: "How it works",
       title: "Live in a day",
@@ -205,17 +193,6 @@ const COPY = {
       },
     },
     marquee: "Platos que ya están en 3D",
-    stats: [
-      {
-        to: 0.5,
-        decimals: 1,
-        suffix: "%",
-        label: "de error máximo de tamaño en cada modelo",
-      },
-      { to: 3, suffix: " s", label: "del QR al menú" },
-      { to: 2, label: "idiomas, elegidos automáticamente" },
-      { to: 0, label: "apps para descargar" },
-    ],
     how: {
       eyebrow: "Cómo funciona",
       title: "Listo en un día",
@@ -472,7 +449,6 @@ export function Landing({ locale }: { locale: Locale }) {
   return (
     <div
       className={`${fraunces.variable} ${manrope.variable} overflow-x-clip bg-(--rf-paper) text-(--rf-ink) [font-family:var(--font-manrope),system-ui,sans-serif]`}
-      style={paletteVars}
     >
       {/* Scroll progress */}
       <div
@@ -625,25 +601,6 @@ export function Landing({ locale }: { locale: Locale }) {
       </section>
 
       <main>
-        {/* --- Stats ------------------------------------------------------------ */}
-        <section className="bg-(--rf-accent) text-(--rf-ink)">
-          <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-4 py-12 sm:px-6 md:grid-cols-4">
-            {t.stats.map((s, i) => (
-              <Reveal key={s.label} delay={i * 120}>
-                <dt className="sr-only">{s.label}</dt>
-                <dd className={`${serif} text-5xl sm:text-6xl`}>
-                  <CountUp
-                    to={s.to}
-                    decimals={"decimals" in s ? s.decimals : 0}
-                    suffix={"suffix" in s ? s.suffix : ""}
-                  />
-                </dd>
-                <dd className="mt-1 text-sm font-bold opacity-80">{s.label}</dd>
-              </Reveal>
-            ))}
-          </dl>
-        </section>
-
         {/* --- How it works ------------------------------------------------- */}
         <section
           id="how"

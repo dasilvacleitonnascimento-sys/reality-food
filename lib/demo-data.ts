@@ -49,7 +49,7 @@ export type Restaurant = {
   slug: string;
   logo: string;
   tagline: string;
-  /** Brand color for buttons and accents. Must pass 4.5:1 contrast with white text. */
+  /** Stored per restaurant. Menus currently use the shared Reality Food palette (app/globals.css). */
   primaryColor: string;
   categories: Category[];
   dishes: Dish[];
@@ -62,7 +62,7 @@ export const demoBistro: Restaurant = {
   slug: "demo-bistro",
   logo: "/images/demo-bistro-logo.svg",
   tagline: "Seasonal plates, made from scratch.",
-  primaryColor: "#9a3412",
+  primaryColor: "#191A1F",
   categories: [
     { id: "starters", name: "Starters" },
     { id: "mains", name: "Mains" },

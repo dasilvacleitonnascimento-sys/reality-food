@@ -61,7 +61,7 @@ export function ArGuide({ text, onOpen, onCancel }: Props) {
           ref={openRef}
           type="button"
           onClick={onOpen}
-          className="mt-6 h-14 w-full rounded-xl bg-(--brand) text-base font-semibold text-white outline-none focus-visible:ring-4 focus-visible:ring-ring/50"
+          className="mt-6 h-14 w-full rounded-xl bg-(--brand) text-base font-semibold text-(--brand-foreground) outline-none focus-visible:ring-4 focus-visible:ring-ring/50"
         >
           {text.open}
         </button>

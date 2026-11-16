@@ -50,7 +50,7 @@ export default function RestaurantSitePage(
   props: PageProps<"/[lang]/[slug]/site">,
 ) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FBF6EF]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-(--rf-paper)" />}>
       <RestaurantSite params={props.params} />
     </Suspense>
   );
@@ -71,7 +71,13 @@ async function RestaurantSite({
 
   const t = site.text[lang];
   const dict = getDictionary(lang);
-  const { ink, paper, accent, soft } = site.colors;
+  // Colors come from the shared Reality Food palette (app/globals.css).
+  const ink = "var(--rf-ink)";
+  const paper = "var(--rf-paper)";
+  const accent = "var(--rf-accent)";
+  const accentText = "var(--rf-accent-text)";
+  const soft = "var(--rf-accent-soft)";
+  const alpha = (color: string, percent: number) => `color-mix(in srgb, ${color} ${percent}%, transparent)`;
   const byId = (id: string) => restaurant.dishes.find((d) => d.id === id);
   const hero = byId(site.heroDishId);
   const featured = site.featuredDishIds
@@ -88,7 +94,7 @@ async function RestaurantSite({
     >
       <header
         className="sticky top-0 z-20 border-b backdrop-blur"
-        style={{ background: `${paper}e6`, borderColor: `${ink}14` }}
+        style={{ background: alpha(paper, 90), borderColor: alpha(ink, 8) }}
       >
         <nav className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
           <a
@@ -142,14 +148,14 @@ async function RestaurantSite({
               <Link
                 href={menuHref}
                 className={button}
-                style={{ background: accent, color: "#fff" }}
+                style={{ background: accent, color: ink }}
               >
                 {t.menuCta}
               </Link>
               <a
                 href={`tel:${site.phone.tel}`}
                 className={`${button} border-2`}
-                style={{ borderColor: `${ink}26` }}
+                style={{ borderColor: alpha(ink, 15) }}
               >
                 <Phone className="size-4" aria-hidden />
                 {t.callCta}
@@ -174,7 +180,7 @@ async function RestaurantSite({
               <figcaption className="mt-1 flex flex-col items-center gap-2 text-center">
                 <span
                   className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold"
-                  style={{ background: ink, color: soft }}
+                  style={{ background: ink, color: accent }}
                 >
                   <Ruler className="size-4" aria-hidden />
                   {t.trueSize(plate(hero.plateDiameterCm))}
@@ -191,7 +197,7 @@ async function RestaurantSite({
         <section
           aria-labelledby="featured-heading"
           className="py-14"
-          style={{ background: "#fff" }}
+          style={{ background: "var(--rf-card)" }}
         >
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 id="featured-heading" className={`${serif} text-4xl`}>
@@ -204,7 +210,7 @@ async function RestaurantSite({
                   <Link
                     href={`${menuHref}/dish/${dish.id}`}
                     className="group block overflow-hidden rounded-2xl border outline-none focus-visible:ring-4"
-                    style={{ borderColor: `${ink}14`, background: paper }}
+                    style={{ borderColor: alpha(ink, 8), background: paper }}
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
@@ -230,7 +236,7 @@ async function RestaurantSite({
                       <div className="mt-4 flex items-center justify-between text-sm font-bold">
                         <span
                           className="inline-flex items-center gap-1"
-                          style={{ color: accent }}
+                          style={{ color: accentText }}
                         >
                           <Ruler className="size-4" aria-hidden />
                           {dict.dish.sizeShort(
@@ -279,7 +285,7 @@ async function RestaurantSite({
                 >
                   <span
                     className="flex size-9 items-center justify-center rounded-full font-bold"
-                    style={{ background: soft, color: ink }}
+                    style={{ background: accent, color: ink }}
                   >
                     {i + 1}
                   </span>
