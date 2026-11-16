@@ -6,6 +6,7 @@
 //
 // Needs NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY in .env.local.
 
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -24,8 +25,15 @@ const db = createClient(url, secret, { auth: { persistSession: false, autoRefres
 const { getRestaurants } = await import(pathToFileURL(path.join(root, "lib", "demo-data.ts")).href);
 const BUCKET = "dish-media";
 
-const CONTENT_TYPES = { ".glb": "model/gltf-binary", ".jpg": "image/jpeg", ".png": "image/png", ".svg": "image/svg+xml", ".webp": "image/webp" };
+const CONTENT_TYPES = { ".glb": "model/gltf-binary", ".usdz": "model/vnd.usdz+zip", ".jpg": "image/jpeg", ".png": "image/png", ".svg": "image/svg+xml", ".webp": "image/webp" };
 const uploaded = new Map();
+
+/** "/models/x.glb" -> "/models/x.usdz" when that file exists. */
+function usdzNextTo(glbUrl) {
+  if (!glbUrl) return null;
+  const usdz = glbUrl.replace(/\.glb$/, ".usdz");
+  return existsSync(path.join(root, "public", usdz)) ? usdz : null;
+}
 
 /** Uploads /public/<publicPath> to <restaurantId>/<name> and returns the storage path. */
 async function upload(restaurantId, publicPath) {
@@ -103,6 +111,8 @@ for (const r of getRestaurants()) {
       tags: d.tags,
       photo_path: await upload(rid, d.photo),
       model_glb_path: await upload(rid, d.glbUrl),
+      // iPhone AR file from `npm run build-usdz` (next to the .glb), if built.
+      model_usdz_path: await upload(rid, d.usdzUrl ?? usdzNextTo(d.glbUrl)),
       plate_diameter_cm: d.plateDiameterCm,
       portion_cm: d.portionCm ?? null,
       served_in: d.servedIn?.kind ?? "plate",

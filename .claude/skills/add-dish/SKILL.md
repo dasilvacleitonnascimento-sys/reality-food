@@ -57,7 +57,10 @@ run anything from inside it.
    until Supabase is wired; afterwards, insert into `public.dishes`):
    `glbUrl: "/models/<restaurant>/<dish-id>.glb"`, `plateDiameterCm`, `servedIn`
    for cups/glasses/bowls, and `portionCm` measured from the food only.
-4. Verify: `npm run check-models` must pass (plate within 0.5%, nothing under the
+4. iPhone AR file: `npm run build-usdz -- <dish-id>` (pre-builds the .usdz so
+   Quick Look opens in a second instead of converting on the diner's phone;
+   must stay under 5 MB). `npm run seed` uploads it with the dish.
+5. Verify: `npm run check-models` must pass (plate within 0.5%, nothing under the
    table, under 5 MB). Then `npx tsc --noEmit` and `npx eslint`.
-5. Tell the user the final size, and how to open the dish on their phone
+6. Tell the user the final size, and how to open the dish on their phone
    (dev server + tunnel link, or the deployed URL).

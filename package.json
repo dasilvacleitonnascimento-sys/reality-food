@@ -10,7 +10,8 @@
     "demo-assets": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-demo-assets.mjs",
     "check-models": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-models.mjs",
     "import-model": "node scripts/import-model.mjs",
-    "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-supabase.mjs"
+    "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-supabase.mjs",
+    "build-usdz": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-usdz.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

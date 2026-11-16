@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# iPhone AR files: built by `npm run build-usdz`, uploaded to Supabase by `npm run seed`
+public/models/**/*.usdz
