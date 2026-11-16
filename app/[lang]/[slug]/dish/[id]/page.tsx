@@ -102,10 +102,10 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
         )}
 
         <p className="mt-3 text-muted-foreground">{dish.description}</p>
-        <section aria-label={t.dish.sizeHeading} className="mt-5 flex gap-3 rounded-xl border border-[#0B7A70]/25 bg-[#0B7A70]/5 p-4">
-          <Ruler className="mt-0.5 size-5 shrink-0 text-[#0B7A70]" aria-hidden />
+        <section aria-label={t.dish.sizeHeading} className="mt-5 flex gap-3 rounded-xl border border-[#FBB71A]/60 bg-[#FBB71A]/10 p-4">
+          <Ruler className="mt-0.5 size-5 shrink-0 text-[#8A5A00]" aria-hidden />
           <div className="text-sm">
-            <p className="font-semibold text-[#08615A]">{t.dish.sizeHeading}</p>
+            <p className="font-semibold text-[#8A5A00]">{t.dish.sizeHeading}</p>
             {dish.portionCm && (
               <p className="mt-1">
                 {t.dish.portion(

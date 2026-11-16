@@ -67,7 +67,7 @@ function makeRuler(plateWidth: number, maxAnisotropy: number) {
   const h = canvas.height;
   ctx.fillStyle = "rgba(255, 255, 255, 0.93)";
   ctx.fillRect(0, 0, canvas.width, h);
-  ctx.fillStyle = "#1c1714";
+  ctx.fillStyle = "#191A1F";
   ctx.font = `600 ${Math.round(h * 0.32)}px system-ui, sans-serif`;
   ctx.textBaseline = "bottom";
   for (let mm = 0; mm <= lengthCm * 10; mm++) {
@@ -78,7 +78,7 @@ function makeRuler(plateWidth: number, maxAnisotropy: number) {
   }
   // Mark the plate's measured diameter.
   const plateX = plateWidth * 100 * pxPerCm;
-  ctx.fillStyle = "#b93a15";
+  ctx.fillStyle = "#8A5A00";
   ctx.fillRect(plateX - 2, 0, 4, h);
   ctx.textAlign = "right";
   ctx.fillText(`${(plateWidth * 100).toFixed(1)} cm`, plateX - 8, h - 6);

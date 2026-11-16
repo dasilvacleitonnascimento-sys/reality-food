@@ -32,7 +32,7 @@ export function DishCard({ dish, href, soldOutLabel, sizeLabel, preloadPhoto = f
           {dish.description}
         </p>
         {sizeLabel && (
-          <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-[#0B7A70]">
+          <p className="mt-1.5 flex items-center gap-1 text-xs font-medium text-[#8A5A00]">
             <Ruler className="size-3.5" aria-hidden />
             {sizeLabel}
           </p>

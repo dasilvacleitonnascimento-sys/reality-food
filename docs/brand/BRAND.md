@@ -27,24 +27,20 @@ Visual board: open `docs/brand/index.html` in a browser.
 
 ## Color
 
-Two complementary heroes: **Tomato** (the food) and **Lens** (the camera, the measurement).
+Three colors: **Charcoal**, **Ivory** and **Golden Yellow** — premium, high contrast, and warm like caramel, bread and honey.
 
 | Name | Hex | Use |
 |---|---|---|
-| Ink | `#15181C` | Text, logo, dark sections |
-| Cream | `#FAF7F1` | Main background |
-| Linen | `#EFE8DC` | Cards, borders, subtle surfaces |
-| Stone | `#66605A` | Secondary text (5.8:1 on Cream) |
-| Tomato | `#E5483A` | Brand accent, the plate in the logo, accents on dark (4.5:1 on Ink) |
-| Tomato Deep | `#B8301F` | Primary buttons with white text (6.0:1), "Food" in the wordmark |
-| Lens | `#0B7A70` | Measurements, rulers, AR corners, secondary buttons (white text 5.2:1) |
-| Lens Light | `#7FD6C9` | Lens on dark backgrounds (10.5:1 on Ink) |
-| Saffron | `#F4B63E` | The "3D" badge and highlights (Ink text 9.8:1) |
+| Charcoal | `#191A1F` | Text, dark sections, letters of the logo |
+| Ivory | `#E7E7E7` | Main light background |
+| Golden Yellow | `#FBB71A` | The logo's plate, buttons (Charcoal text, 9.8:1), accents on Charcoal (9.8:1) |
+| Dark Gold | `#8A5A00` | Gold for text and icons on light backgrounds (4.8:1 on Ivory, 5.9:1 on white) |
+| Graphite | `#55565C` | Secondary text (5.9:1 on Ivory) |
 
 Rules:
-- Tomato for appetite and action; Lens for anything about size, accuracy or the camera. Don't swap them.
-- Tomato (not Deep) is never used for small text on light backgrounds (3.9:1). Use Tomato Deep.
-- Roughly 70% Cream/Linen, 20% Ink, 10% Tomato + Lens + Saffron.
+- Golden Yellow is never text on Ivory or white (1.4:1). Use Dark Gold there.
+- Buttons in Golden Yellow always have Charcoal text, never white.
+- Gold is a garnish: about 10% of a screen. Mostly Charcoal and Ivory.
 - Diner menus use each restaurant's own brand color. Reality Food colors appear on the landing page, dashboards, admin and sales material.
 
 ## Typography
@@ -55,7 +51,7 @@ Rules:
 
 ## Logo
 
-- Mark: the **RF monogram** — the letters R and F drawn in Cream on a round Tomato plate, with a faint plate rim. Letters are drawn as paths (no font needed), so the mark looks identical everywhere: app icon, table stickers, QR cards, merch.
+- Mark: the **RF monogram** — the letters R and F drawn in Charcoal on a round Golden Yellow plate, with a faint plate rim. Letters are drawn as paths (no font needed), so the mark looks identical everywhere: app icon, table stickers, QR cards, merch.
 - Files: `reality-food-mark.svg` (app icon; also `app/icon.svg`), `reality-food-logo.svg` (light backgrounds), `reality-food-logo-dark.svg` (Ink backgrounds).
 - Minimum size: mark 20px, full logo 140px wide. Clear space: half the plate's radius on every side.
 - The wordmark is live text in Fraunces. Outline it (convert to paths) before print or merch.
@@ -65,6 +61,6 @@ Rules:
 
 - Rounded corners 12–16px, soft shadows, generous white space: it should feel like good tableware.
 - The "View on your table" button is always the most prominent element on a dish page.
-- Measurements always appear with a small ruler cue in Lens color.
-- The "3D" badge: Saffron background, Ink text, bold.
+- Measurements always appear with a small ruler cue in Dark Gold.
+- The "3D" badge: Golden Yellow background, Charcoal text, bold.
 - Photography: warm, 3/4 angle, real tables, natural light — and always the restaurant's own dish.

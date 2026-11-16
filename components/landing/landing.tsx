@@ -122,16 +122,17 @@ const COPY = {
   },
 } as const;
 
+// Reality Food palette: Charcoal, Ivory, Golden Yellow (+ a dark gold for text on light).
 const C = {
-  ink: "#15181C",
-  cream: "#FAF7F1",
-  linen: "#EFE8DC",
-  stone: "#66605A",
-  tomato: "#E5483A",
-  tomatoDeep: "#B8301F",
-  lens: "#0B7A70",
-  lensLight: "#7FD6C9",
-  saffron: "#F4B63E",
+  ink: "#191A1F", // charcoal
+  cream: "#E7E7E7", // ivory
+  linen: "#D9D9DB",
+  stone: "#55565C", // secondary text (5.9:1 on ivory)
+  tomato: "#FBB71A", // gold accent on dark
+  tomatoDeep: "#8A5A00", // gold for text/icons on light (4.8:1 on ivory)
+  lens: "#8A5A00",
+  lensLight: "#FBB71A",
+  saffron: "#FBB71A",
 };
 
 const serif = "[font-family:var(--font-fraunces),Georgia,serif] font-semibold tracking-tight";
@@ -143,8 +144,8 @@ function Mark({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden>
       <circle cx="32" cy="32" r="29" fill={C.tomato} />
-      <circle cx="32" cy="32" r="23.6" fill="none" stroke={C.cream} strokeWidth="1.5" opacity="0.5" />
-      <g fill="none" stroke={C.cream} strokeWidth="4.8" strokeLinecap="round" strokeLinejoin="round" transform="translate(-0.6 0)">
+      <circle cx="32" cy="32" r="23.6" fill="none" stroke={C.ink} strokeWidth="1.5" opacity="0.35" />
+      <g fill="none" stroke={C.ink} strokeWidth="4.8" strokeLinecap="round" strokeLinejoin="round" transform="translate(-0.6 0)">
         <path d="M17.6 44.5V19.5h8.9a6.45 6.45 0 0 1 0 12.9h-8.9M25.9 32.4l5.4 12.1" />
         <path d="M37.4 44.5V19.5h10.2M37.4 31.6h8.4" />
       </g>
@@ -210,7 +211,7 @@ export function Landing({ locale }: { locale: Locale }) {
             </h1>
             <p className="mt-5 max-w-lg text-lg leading-relaxed opacity-85">{t.hero.body}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={demoHref} className={btn} style={{ background: C.tomatoDeep, color: "#fff" }}>{t.hero.primary}</Link>
+              <Link href={demoHref} className={btn} style={{ background: C.saffron, color: C.ink }}>{t.hero.primary}</Link>
               <a href={contactHref} className={`${btn} border`} style={{ borderColor: "#3a3f46", color: C.cream }}>{t.hero.secondary}</a>
             </div>
             <p className="mt-5 flex items-center gap-2 text-sm opacity-75">
@@ -229,7 +230,7 @@ export function Landing({ locale }: { locale: Locale }) {
             {t.how.steps.map(({ icon: Icon, title, body }, i) => (
               <li key={title} className="rounded-2xl border p-6" style={{ background: "#fff", borderColor: C.linen }}>
                 <div className="flex items-center gap-3">
-                  <span className="grid size-11 place-items-center rounded-xl" style={{ background: "#e3f2ef", color: C.lens }}>
+                  <span className="grid size-11 place-items-center rounded-xl" style={{ background: C.ink, color: C.saffron }}>
                     <Icon className="size-5" aria-hidden />
                   </span>
                   <span className="text-sm font-bold" style={{ color: C.stone }}>0{i + 1}</span>
@@ -275,7 +276,7 @@ export function Landing({ locale }: { locale: Locale }) {
                   <p className="text-lg font-bold">{demo.name}</p>
                   <p className="mt-1 text-sm" style={{ color: C.stone }}>{demo.note}</p>
                 </div>
-                <span className="shrink-0 rounded-lg px-3 py-2 text-sm font-bold" style={{ background: "#e3f2ef", color: C.lens }}>
+                <span className="shrink-0 rounded-lg px-3 py-2 text-sm font-bold" style={{ background: C.ink, color: C.saffron }}>
                   {t.demos.open} →
                 </span>
               </Link>
@@ -288,12 +289,12 @@ export function Landing({ locale }: { locale: Locale }) {
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <h2 className={`${serif} text-3xl sm:text-4xl`}>{t.pricing.title}</h2>
             <div className="mt-10 grid gap-5 md:grid-cols-[1fr_1fr_1.1fr]">
-              <div className="rounded-2xl p-6" style={{ background: "#1f2329" }}>
+              <div className="rounded-2xl p-6" style={{ background: "#26272E" }}>
                 <p className="text-sm font-bold tracking-wide uppercase" style={{ color: C.lensLight }}>{t.pricing.setup}</p>
                 <p className={`${serif} mt-2 text-5xl`}>${SITE.pricing.setupUsd}</p>
                 <p className="mt-3 leading-relaxed opacity-80">{t.pricing.setupBody(SITE.pricing.dishesIncluded)}</p>
               </div>
-              <div className="rounded-2xl p-6" style={{ background: "#1f2329" }}>
+              <div className="rounded-2xl p-6" style={{ background: "#26272E" }}>
                 <p className="text-sm font-bold tracking-wide uppercase" style={{ color: C.lensLight }}>{t.pricing.monthlyLabel}</p>
                 <p className={`${serif} mt-2 text-5xl`}>
                   ${SITE.pricing.monthlyUsd}
@@ -310,7 +311,7 @@ export function Landing({ locale }: { locale: Locale }) {
                     </li>
                   ))}
                 </ul>
-                <a href={contactHref} className={`${btn} mt-6 w-full`} style={{ background: C.tomatoDeep, color: "#fff" }}>
+                <a href={contactHref} className={`${btn} mt-6 w-full`} style={{ background: C.saffron, color: C.ink }}>
                   {t.pricing.cta}
                 </a>
               </div>

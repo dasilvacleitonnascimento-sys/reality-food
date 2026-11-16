@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Reality Food">
-  <!-- RF monogram on a Tomato plate. Letters are paths: no font needed. -->
-  <circle cx="32" cy="32" r="29" fill="#E5483A"/>
-  <circle cx="32" cy="32" r="23.6" fill="none" stroke="#FAF7F1" stroke-width="1.5" opacity="0.5"/>
-  <g fill="none" stroke="#FAF7F1" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.6 0)">
+  <!-- RF monogram on a Golden Yellow plate. Letters are paths: no font needed. -->
+  <circle cx="32" cy="32" r="29" fill="#FBB71A"/>
+  <circle cx="32" cy="32" r="23.6" fill="none" stroke="#191A1F" stroke-width="1.5" opacity="0.35"/>
+  <g fill="none" stroke="#191A1F" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.6 0)">
     <path d="M17.6 44.5V19.5h8.9a6.45 6.45 0 0 1 0 12.9h-8.9M25.9 32.4l5.4 12.1"/>
     <path d="M37.4 44.5V19.5h10.2M37.4 31.6h8.4"/>
   </g>
