@@ -108,6 +108,18 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
 
   const canFollow = followSupported === true;
 
+  // iPhone: once the 3D view is ready, download the AR file in the background so
+  // "View on your table" opens without waiting on the restaurant's Wi-Fi.
+  useEffect(() => {
+    if (progress < 1 || !usdzUrl) return;
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (!ios || document.querySelector(`link[rel="prefetch"][href="${CSS.escape(usdzUrl)}"]`)) return;
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.href = usdzUrl;
+    document.head.appendChild(link);
+  }, [progress, usdzUrl]);
+
   /** Opens the camera. Must run inside a tap (browsers require a user gesture). */
   const openAr = async () => {
     setShowGuide(false);
