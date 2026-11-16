@@ -13,6 +13,12 @@ type ModelViewerAttributes = DetailedHTMLProps<
   "ar-modes"?: string;
   "ar-scale"?: "auto" | "fixed";
   "camera-controls"?: boolean;
+  "camera-orbit"?: string;
+  "disable-zoom"?: boolean;
+  "auto-rotate"?: boolean;
+  "rotation-per-second"?: string;
+  "interaction-prompt"?: "auto" | "none";
+  exposure?: string;
   "touch-action"?: "pan-y" | "pan-x" | "none";
   "shadow-intensity"?: string;
   loading?: "auto" | "lazy" | "eager";
