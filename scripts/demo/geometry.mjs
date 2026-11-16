@@ -97,6 +97,8 @@ export class Part {
     this.color = color;
     this.k = k;
     this.weld = weld;
+    /** Reversed triangle winding, so the front side faces out (see export.mjs orient). */
+    this.flipped = false;
     const count = (nu + 1) * (nv + 1);
     this.local = new Float64Array(count * 3);
     for (let j = 0; j <= nv; j++) {
@@ -151,7 +153,8 @@ export class Part {
         const b = a + 1;
         const c = a + row + 1;
         const d = a + row;
-        out.push(a, b, c, a, c, d);
+        if (this.flipped) out.push(a, c, b, a, d, c);
+        else out.push(a, b, c, a, c, d);
       }
     }
     return out;

@@ -10,7 +10,8 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { burrata, chocolateCake, shrimpRisotto } from "./demo/dishes.mjs";
+import { burrata, shrimpRisotto } from "./demo/dishes.mjs";
+import { chocolateCake } from "./demo/chocolate-cake.mjs";
 import { bake, writeGlb } from "./demo/export.mjs";
 import { pudim, pudimSlice } from "./demo/pudim.mjs";
 import { renderPhoto } from "./demo/render.mjs";
@@ -25,9 +26,9 @@ await mkdir(imagesDir, { recursive: true });
 await mkdir(modelsDir, { recursive: true });
 
 const logo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112" role="img" aria-label="Demo Bistro">
-  <circle cx="56" cy="56" r="56" fill="#9a3412"/>
-  <circle cx="56" cy="56" r="47" fill="none" stroke="#fed7aa" stroke-width="2"/>
-  <text x="56" y="67" text-anchor="middle" font-family="Georgia, serif" font-size="34" font-weight="700" fill="#fff7ed">DB</text>
+  <circle cx="56" cy="56" r="56" fill="#191A1F"/>
+  <circle cx="56" cy="56" r="47" fill="none" stroke="#FBB71A" stroke-width="2"/>
+  <text x="56" y="67" text-anchor="middle" font-family="Georgia, serif" font-size="34" font-weight="700" fill="#FBB71A">DB</text>
 </svg>
 `;
 await writeFile(path.join(imagesDir, "demo-bistro-logo.svg"), logo);
@@ -53,8 +54,9 @@ await mkdir(path.join(modelsDir, "ironside"), { recursive: true });
 await writeFile(
   path.join(imagesDir, "ironside", "logo.svg"),
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112" role="img" aria-label="Ironside Cafe">
-  <circle cx="56" cy="56" r="56" fill="#1f3a33"/>
-  <text x="56" y="66" text-anchor="middle" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#f3efe6">IC</text>
+  <circle cx="56" cy="56" r="56" fill="#191A1F"/>
+  <circle cx="56" cy="56" r="47" fill="none" stroke="#FBB71A" stroke-width="2"/>
+  <text x="56" y="66" text-anchor="middle" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#FBB71A">IC</text>
 </svg>
 `,
 );

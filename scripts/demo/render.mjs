@@ -3,7 +3,7 @@
 
 import sharp from "sharp";
 import { fbm } from "./geometry.mjs";
-import { MATERIALS, TRANSPARENT } from "./export.mjs";
+import { CLEARCOAT, MATERIALS, TRANSPARENT } from "./export.mjs";
 
 const norm = (v) => {
   const l = Math.hypot(v[0], v[1], v[2]) || 1;
@@ -66,6 +66,8 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
     idx: part.indices(),
     rough: MATERIALS[part.material],
     alpha: TRANSPARENT[part.material],
+    // Clear coat only when the model was baked with PBR maps (same rule as the .glb).
+    clearcoat: atlas.pbr ? CLEARCOAT[part.material] : undefined,
   }));
 
   // See-through parts (glass) don't block the light.
@@ -135,7 +137,34 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
     return out;
   };
 
-  const shade = (p, n, albedo, rough) => {
+  const texel = (s, t) => {
+    const x = Math.min(Math.max(s * atlas.width - 0.5, 0), atlas.width - 1.001);
+    const y = Math.min(Math.max(t * atlas.height - 0.5, 0), atlas.height - 1.001);
+    const x0 = Math.floor(x);
+    const y0 = Math.floor(y);
+    return { i00: y0 * atlas.width + x0, fx: x - x0, fy: y - y0 };
+  };
+  const bilinear = (A, stride, comp, { i00, fx, fy }) => {
+    const W0 = atlas.width;
+    const a = A[i00 * stride + comp];
+    const b = A[(i00 + 1) * stride + comp];
+    const d = A[(i00 + W0) * stride + comp];
+    const e = A[(i00 + W0 + 1) * stride + comp];
+    return (a + (b - a) * fx) * (1 - fy) + (d + (e - d) * fx) * fy;
+  };
+
+  const smooth = (a, b, x) => {
+    const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  };
+  const studio = (d, rough) => {
+    const key = dot(norm(d), LIGHT);
+    // Rougher surfaces see a blurrier, wider softbox.
+    const w = 0.04 + rough * 0.5;
+    return 0.05 + 0.1 * Math.max(d[1], 0) + 2.4 * smooth(1 - w - 0.05, 1 - w * 0.25, key) + 0.25 * smooth(0.4, 0.9, key);
+  };
+
+  const shade = (p, n, albedo, rough, ao = 1, clearcoat) => {
     const V = norm([eye[0] - p[0], eye[1] - p[1], eye[2] - p[2]]);
     if (dot(n, V) < 0) n = [-n[0], -n[1], -n[2]];
     const sh = shadowAt(p);
@@ -149,11 +178,24 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
     const nv = Math.max(dot(n, V), 0);
     const refl = [2 * nv * n[0] - V[0], 2 * nv * n[1] - V[1], 2 * nv * n[2] - V[2]];
     const envF = (0.04 + 0.96 * Math.pow(1 - nv, 5)) * (1 - rough) ** 2;
-    const env = refl[1] > 0 ? 0.55 + 0.35 * refl[1] : 0.12;
+    // PBR models get a food-photo studio: dark room, one big softbox at the key light.
+    // Older models keep the original even sky so their photos do not change.
+    const env = atlas.pbr ? studio(refl, rough) : refl[1] > 0 ? 0.55 + 0.35 * refl[1] : 0.12;
+    // Clear coat: a second, sharper reflection on top (glossy chocolate).
+    let ccSpec = 0;
+    let ccEnv = 0;
+    let ccF = 0;
+    if (clearcoat !== undefined) {
+      const ccShin = Math.min(6000, 2 / (clearcoat ** 4 + 1e-4));
+      ccF = 0.04 + 0.96 * Math.pow(1 - nv, 5);
+      ccSpec = (0.04 + 0.96 * Math.pow(1 - Math.max(dot(Hv, V), 0), 5)) * ((ccShin + 8) / (8 * Math.PI)) * Math.pow(Math.max(dot(n, Hv), 0), ccShin) * ndl;
+      ccEnv = (atlas.pbr ? studio(refl, clearcoat) : env) * ccF * (1 - clearcoat) ** 2;
+    }
     const out = [0, 0, 0];
     for (let c = 0; c < 3; c++) {
-      const hemi = GROUND[c] + (SKY[c] - GROUND[c]) * hemiT;
-      out[c] = albedo[c] * (hemi * (0.55 + 0.45 * sh) + LIGHT_COLOR[c] * ndl) + LIGHT_COLOR[c] * spec + env * envF;
+      const hemi = (GROUND[c] + (SKY[c] - GROUND[c]) * hemiT) * ao;
+      const base = albedo[c] * (hemi * (0.55 + 0.45 * sh) + LIGHT_COLOR[c] * ndl) + LIGHT_COLOR[c] * spec + env * envF * ao;
+      out[c] = base * (1 - ccF) + LIGHT_COLOR[c] * ccSpec + ccEnv;
     }
     return out;
   };
@@ -161,7 +203,7 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
   // --- Dish -------------------------------------------------------------------
   // Opaque first, then glass blended on top (no depth writes) so drinks show through.
   const ordered = [...meshes.filter((m) => !m.alpha), ...meshes.filter((m) => m.alpha)];
-  for (const { P, N, UV, idx, rough, alpha } of ordered) {
+  for (const { P, N, UV, idx, rough, alpha, clearcoat } of ordered) {
     const view = [];
     for (let i = 0; i < P.length; i += 3) {
       const v = toView([P[i], P[i + 1], P[i + 2]]);
@@ -175,6 +217,23 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
       const b = view[ib];
       const c = view[ic];
       if (a[2] < 0.01 || b[2] < 0.01 || c[2] < 0.01) continue;
+      let Tw = null;
+      let Bw = null;
+      if (atlas.pbr) {
+        const pa = [P[ia * 3], P[ia * 3 + 1], P[ia * 3 + 2]];
+        const e1 = [P[ib * 3] - pa[0], P[ib * 3 + 1] - pa[1], P[ib * 3 + 2] - pa[2]];
+        const e2 = [P[ic * 3] - pa[0], P[ic * 3 + 1] - pa[1], P[ic * 3 + 2] - pa[2]];
+        const du1 = UV[ib * 2] - UV[ia * 2];
+        const dv1 = UV[ib * 2 + 1] - UV[ia * 2 + 1];
+        const du2 = UV[ic * 2] - UV[ia * 2];
+        const dv2 = UV[ic * 2 + 1] - UV[ia * 2 + 1];
+        const det = du1 * dv2 - du2 * dv1;
+        if (Math.abs(det) > 1e-14) {
+          const inv = 1 / det;
+          Tw = norm([(e1[0] * dv2 - e2[0] * dv1) * inv, (e1[1] * dv2 - e2[1] * dv1) * inv, (e1[2] * dv2 - e2[2] * dv1) * inv]);
+          Bw = norm([(e2[0] * du1 - e1[0] * du2) * inv, (e2[1] * du1 - e1[1] * du2) * inv, (e2[2] * du1 - e1[2] * du2) * inv]);
+        }
+      }
       raster(W, H, a, b, c, (px, py, w0, w1, w2) => {
         const q0 = w0 / a[2];
         const q1 = w1 / b[2];
@@ -189,9 +248,24 @@ export async function renderPhoto(parts, atlas, { file, width = 1200, height = 9
         const k2 = q2 / iz;
         const lerp3 = (A, stride, comp) => A[ia * stride + comp] * k0 + A[ib * stride + comp] * k1 + A[ic * stride + comp] * k2;
         const p = [lerp3(P, 3, 0), lerp3(P, 3, 1), lerp3(P, 3, 2)];
-        const n = norm([lerp3(N, 3, 0), lerp3(N, 3, 1), lerp3(N, 3, 2)]);
-        const albedo = sampleAtlas(lerp3(UV, 2, 0), lerp3(UV, 2, 1));
-        const lit = shade(p, n, albedo, rough);
+        let n = norm([lerp3(N, 3, 0), lerp3(N, 3, 1), lerp3(N, 3, 2)]);
+        const su = lerp3(UV, 2, 0);
+        const sv = lerp3(UV, 2, 1);
+        const albedo = sampleAtlas(su, sv);
+        let r0 = rough;
+        let ao = 1;
+        if (atlas.pbr) {
+          const tx = texel(su, sv);
+          r0 = bilinear(atlas.roughness, 1, 0, tx);
+          ao = bilinear(atlas.occlusion, 1, 0, tx);
+          if (Tw) {
+            const x = bilinear(atlas.tangentNormal, 3, 0, tx);
+            const y = bilinear(atlas.tangentNormal, 3, 1, tx);
+            const zz = bilinear(atlas.tangentNormal, 3, 2, tx);
+            n = norm([Tw[0] * x + Bw[0] * y + n[0] * zz, Tw[1] * x + Bw[1] * y + n[1] * zz, Tw[2] * x + Bw[2] * y + n[2] * zz]);
+          }
+        }
+        const lit = shade(p, n, albedo, r0, ao, clearcoat);
         if (!alpha) {
           color.set(lit, o * 3);
           return;
