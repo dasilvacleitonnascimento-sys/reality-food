@@ -78,7 +78,8 @@ async function getMenuFromDb(slug: string, locale: Locale): Promise<Restaurant |
       description: pick(d.description, locale),
       price: d.price_cents / 100,
       category: d.category?.slug ?? "",
-      photo: mediaUrl(d.photo_path) ?? "/icon.svg",
+      // "" = no photo yet (text-only card).
+      photo: mediaUrl(d.photo_path) ?? "",
       glbUrl: mediaUrl(d.model_glb_path),
       usdzUrl: mediaUrl(d.model_usdz_path),
       plateDiameterCm: Number(d.plate_diameter_cm),

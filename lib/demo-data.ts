@@ -17,7 +17,7 @@ export type Dish = {
   /** Price in US dollars. */
   price: number;
   category: CategoryId;
-  /** Path under /public, 4:3 aspect ratio. */
+  /** Path under /public, 4:3 aspect ratio. "" = no photo yet (text-only card). */
   photo: string;
   /** Path under /public. Only some dishes have a 3D model. */
   glbUrl?: string;
@@ -212,7 +212,41 @@ export const demoBistro: Restaurant = {
   },
 };
 
-const restaurants: Restaurant[] = [demoBistro, ironsideCafe];
+/**
+ * Computer-made food models that look like drawings next to real scans.
+ * Hidden (no 3D, text-only card) until the restaurant's real dish is
+ * scanned. Drinks and the photo-based desserts stay: they look right.
+ * Remove an id from here to show its 3D again.
+ */
+const DRAFT_3D = new Set([
+  // Demo Bistro
+  "burrata",
+  "shrimp-risotto",
+  // Ironside Cafe
+  "pao-de-queijo",
+  "pao-de-queijo-3",
+  "pao-de-queijo-5",
+  "boureka",
+  "classic-croissant",
+  "avocado-toast",
+  "omelette",
+  "scrambled-eggs",
+  "tapioca-crepe",
+  "shakshuka",
+  "classic-acai-bowl",
+  "mango-passion-bowl",
+]);
+
+function hideDrafts(restaurant: Restaurant): Restaurant {
+  return {
+    ...restaurant,
+    dishes: restaurant.dishes.map((d) =>
+      DRAFT_3D.has(d.id) ? { ...d, glbUrl: undefined, usdzUrl: undefined, photo: "" } : d,
+    ),
+  };
+}
+
+const restaurants: Restaurant[] = [demoBistro, ironsideCafe].map(hideDrafts);
 
 export function getRestaurants(): Restaurant[] {
   return restaurants;

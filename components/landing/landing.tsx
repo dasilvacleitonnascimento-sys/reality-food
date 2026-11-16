@@ -409,9 +409,9 @@ export function Landing({ locale }: { locale: Locale }) {
   const ironside = getRestaurant("ironside-cafe", locale)!;
   const plated = bistro.dishes.filter((d) => d.glbUrl);
   const stageDishes: StageDish[] = [
-    "burrata",
+    "double-burger",
     "chocolate-cake",
-    "shrimp-risotto",
+    "schnitzel-plate",
     "pudim-slice",
   ]
     .map((id) => plated.find((d) => d.id === id))
@@ -427,7 +427,7 @@ export function Landing({ locale }: { locale: Locale }) {
   const showcase = [
     ...plated,
     ...ironside.dishes
-      .filter((d) => d.glbUrl && !d.photo.includes("coming-soon"))
+      .filter((d) => d.glbUrl && d.photo)
       .slice(0, 14),
   ];
   const rows = [
@@ -440,8 +440,8 @@ export function Landing({ locale }: { locale: Locale }) {
       .slice(0, 3)
       .map((d) => d.photo),
     "demo-bistro": [
-      "/images/burrata.jpg",
-      "/images/shrimp-risotto.jpg",
+      "/images/schnitzel-plate.jpg",
+      "/images/burger.jpg",
       "/images/chocolate-cake.jpg",
     ],
   };

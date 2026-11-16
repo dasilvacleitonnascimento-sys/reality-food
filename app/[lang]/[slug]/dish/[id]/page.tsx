@@ -72,7 +72,7 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
           alt={t.dish.model3d(dish.name)}
           text={getViewerText(lang, t.dish.sizeShort(dish.servedIn?.kind ?? "plate", plateSize, dish.servedIn?.oz))}
         />
-      ) : (
+      ) : dish.photo ? (
         <div className="relative aspect-4/3 w-full bg-muted">
           <Image
             src={dish.photo}
@@ -83,7 +83,7 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
             className="object-cover"
           />
         </div>
-      )}
+      ) : null}
 
       <article className="px-4 pt-4">
         <div className="flex items-start justify-between gap-4">

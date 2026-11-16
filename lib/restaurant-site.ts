@@ -41,8 +41,8 @@ export type RestaurantSite = {
 };
 
 const demoBistro: RestaurantSite = {
-  heroDishId: "burrata",
-  featuredDishIds: ["schnitzel-plate", "shrimp-risotto", "chocolate-cake"],
+  heroDishId: "double-burger",
+  featuredDishIds: ["schnitzel-plate", "chocolate-cake", "pudim-slice"],
   storyPhotoDishId: "pudim",
   // Fictional restaurant: example street and a 555-01xx number reserved for fiction.
   address: "1200 Example Ave, Miami, FL",

@@ -12,7 +12,7 @@
 //   --max-tris <n>   Triangle budget (default 150000).
 //   --texture <px>   Max texture size (default 2048).
 //   --no-enhance     Keep the scan's raw colors (default: white balance from the
-//                    plate, gentle contrast and +10% saturation).
+//                    plate, gentle contrast and +4% saturation).
 //
 // What it does
 //   1. Levels the model and sets the plate's widest point to exactly --plate cm

@@ -57,7 +57,7 @@ async function RestaurantSite({ params }: { params: PageProps<"/[lang]/[slug]/si
     .map(byId)
     .filter((d) => d !== undefined && Boolean(d.glbUrl))
     .map((d) => ({ id: d!.id, name: d!.name, glbUrl: d!.glbUrl!, sizeLabel: t.trueSize(plate(d!.plateDiameterCm)) }));
-  const marquee = restaurant.dishes.filter((d) => d.isAvailable);
+  const marquee = restaurant.dishes.filter((d) => d.isAvailable && d.photo);
   let word = 0;
 
   return (

@@ -16,7 +16,7 @@ function dish(item: Item): Dish {
   return {
     ...rest,
     tags,
-    photo: model ? `${IMG}/${item.id}.jpg` : `${IMG}/coming-soon.jpg`,
+    photo: model ? `${IMG}/${item.id}.jpg` : "",
     glbUrl: model ? `${MODELS}/${item.id}.glb` : undefined,
     isAvailable: true,
   };

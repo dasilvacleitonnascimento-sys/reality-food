@@ -64,7 +64,7 @@ export function removeIslands(doc, { minTriangles = 80, minFraction = 0.002 } = 
  *  - white balance: bright, low-saturation texels (the plate, rice, cream)
  *    are pulled toward neutral white (half strength, so food keeps its warmth);
  *  - contrast: levels stretched between the 0.5% and 99.5% luminance points;
- *  - +10% saturation, the way food photographers grade.
+ *  - +4% saturation (subtle: scans already carry the real color).
  * Returns a short description of what changed.
  */
 export async function enhanceTextures(doc) {
@@ -104,7 +104,8 @@ export async function enhanceTextures(doc) {
     lum.sort((a, b) => a - b);
     const lo = lum[Math.floor(lum.length * 0.005)];
     const hi = lum[Math.floor(lum.length * 0.995)];
-    const scale = hi > lo ? Math.min(1.35, 245 / (hi - lo)) : 1;
+    // Gentle: strong contrast/saturation made buns look orange (burger scan, 16/11).
+    const scale = hi > lo ? Math.min(1.08, 245 / (hi - lo)) : 1;
     const offset = -lo * scale + 4;
 
     const out = await sharp(input)
@@ -115,11 +116,11 @@ export async function enhanceTextures(doc) {
         [0, 0, gains[2]],
       ])
       .linear(scale, offset)
-      .modulate({ saturation: 1.1 })
+      .modulate({ saturation: 1.04 })
       .jpeg({ quality: 92 })
       .toBuffer();
     texture.setImage(new Uint8Array(out)).setMimeType("image/jpeg");
-    notes.push(`white balance ${gains.map((g) => g.toFixed(2)).join("/")}, contrast x${scale.toFixed(2)}, saturation +10%`);
+    notes.push(`white balance ${gains.map((g) => g.toFixed(2)).join("/")}, contrast x${scale.toFixed(2)}, saturation +4%`);
   }
   return notes;
 }
