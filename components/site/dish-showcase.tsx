@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Ruler } from "lucide-react";
+import { PlateRuler } from "@/components/measure/plate-ruler";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
-export type ShowcaseDish = { id: string; name: string; glbUrl: string; sizeLabel: string };
+export type ShowcaseDish = { id: string; name: string; glbUrl: string; sizeLabel: string; plateCm: number };
 
 type Props = {
   dishes: ShowcaseDish[];
@@ -22,6 +24,8 @@ export function DishShowcase({ dishes, text }: Props) {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(false);
   const [autoPlay, setAutoPlay] = useState(true);
+  // Reduced motion: no auto-rotate and no auto-play.
+  const still = useReducedMotion();
   const dish = dishes[index];
   const currentUrl = useRef(dish.glbUrl);
   useEffect(() => {
@@ -62,7 +66,7 @@ export function DishShowcase({ dishes, text }: Props) {
 
   // Next dish CYCLE_MS after the current one is on screen (slow phones never skip a dish).
   useEffect(() => {
-    if (!visible || !autoPlay || dishes.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!visible || !autoPlay || still || dishes.length < 2) return;
     let swap: ReturnType<typeof setTimeout>;
     const timer = setTimeout(() => {
       setVisible(false);
@@ -72,7 +76,7 @@ export function DishShowcase({ dishes, text }: Props) {
       clearTimeout(timer);
       clearTimeout(swap);
     };
-  }, [visible, autoPlay, dishes.length]);
+  }, [visible, autoPlay, still, dishes.length]);
 
   function pick(i: number) {
     setAutoPlay(false);
@@ -84,10 +88,8 @@ export function DishShowcase({ dishes, text }: Props) {
   return (
     <div className="relative">
       <div className="relative mx-auto aspect-square w-full max-w-[560px]">
-        {/* Gold light under the dish */}
-        <div aria-hidden className="rf-pulse absolute inset-x-[12%] bottom-[14%] h-[22%] rounded-[50%] bg-(--rf-accent) opacity-25 blur-3xl" />
-        <div aria-hidden className="absolute inset-[6%] rounded-full border border-(--rf-accent)/15" />
-        <div aria-hidden className="rf-spin-slow absolute inset-[6%] rounded-full border-t-2 border-(--rf-accent)/60" />
+        {/* Warm light on the table under the dish */}
+        <div aria-hidden className="absolute inset-x-[18%] bottom-[16%] h-[16%] rounded-[50%] bg-(--rf-accent) opacity-15 blur-3xl" />
 
         <model-viewer
           ref={viewerRef}
@@ -95,7 +97,7 @@ export function DishShowcase({ dishes, text }: Props) {
           alt={dish.name}
           camera-controls
           disable-zoom
-          auto-rotate
+          {...(still ? {} : { "auto-rotate": true })}
           rotation-per-second="20deg"
           camera-orbit="0deg 60deg auto"
           interaction-prompt="none"
@@ -114,19 +116,21 @@ export function DishShowcase({ dishes, text }: Props) {
           </span>
         )}
 
-        {/* Real-size label, replayed for every dish */}
-        <div key={dish.id} className="absolute inset-x-0 bottom-[4%] flex flex-col items-center gap-1.5">
-          <span className="rf-pop inline-flex items-center gap-1.5 rounded-full bg-(--rf-accent) px-3.5 py-1.5 text-sm font-bold text-(--rf-ink) shadow-[0_8px_30px_-6px_var(--rf-accent)]" style={{ animationDelay: "300ms" }}>
-            <Ruler className="size-4" aria-hidden />
-            {dish.sizeLabel}
-          </span>
-        </div>
       </div>
 
-      <p key={`name-${dish.id}`} className="rf-pop mt-1 text-center text-lg font-bold" style={{ animationDelay: "100ms" }} aria-live="polite">
+      {/* The one moment on this page: a ruler draws the plate's width, then the size appears. Replayed per dish. */}
+      <div key={dish.id} className="mx-auto -mt-4 flex max-w-[340px] flex-col items-center gap-2.5 px-6">
+        <PlateRuler cm={dish.plateCm} animate className="text-(--rf-accent)" />
+        <span className="rf-pop inline-flex items-center gap-1.5 rounded-full bg-(--rf-accent) px-3.5 py-1.5 text-sm font-bold text-(--rf-ink)" style={{ animationDelay: "1.4s" }}>
+          <Ruler className="size-4" aria-hidden />
+          {dish.sizeLabel}
+        </span>
+      </div>
+
+      <p className="rf-serif mt-3 text-center text-xl" aria-live="polite">
         {dish.name}
       </p>
-      <p className="mt-0.5 text-center text-sm opacity-60">{text.dragHint}</p>
+      <p className="mt-0.5 text-center text-sm text-muted-foreground">{text.dragHint}</p>
 
       <div role="group" aria-label={text.pick} className="mt-5 flex flex-wrap justify-center gap-2">
         {dishes.map((d, i) => (
@@ -136,12 +140,12 @@ export function DishShowcase({ dishes, text }: Props) {
             aria-pressed={i === index}
             onClick={() => pick(i)}
             className={`relative h-10 overflow-hidden rounded-full border px-4 text-sm font-bold outline-none transition-colors focus-visible:ring-4 focus-visible:ring-(--rf-accent)/50 ${
-              i === index ? "border-(--rf-accent) bg-(--rf-accent) text-(--rf-ink)" : "border-white/15 hover:border-(--rf-accent)"
+              i === index ? "border-(--rf-accent) bg-(--rf-accent) text-(--rf-ink)" : "border-border hover:border-(--rf-accent)"
             }`}
           >
             {d.name}
             {/* Auto-play countdown */}
-            {i === index && autoPlay && visible && (
+            {i === index && autoPlay && !still && visible && (
               <span key={`bar-${index}`} aria-hidden className="rf-countdown absolute inset-x-0 bottom-0 h-0.5 bg-(--rf-ink)/40" style={{ animationDuration: `${CYCLE_MS}ms` }} />
             )}
           </button>

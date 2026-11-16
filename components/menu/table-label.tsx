@@ -8,7 +8,7 @@ export function TableLabel({ label }: { label: string }) {
   if (!table) return null;
 
   return (
-    <p className="mt-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+    <p className="mt-1 text-sm font-medium text-(--brand-text)">
       {label} {table}
     </p>
   );

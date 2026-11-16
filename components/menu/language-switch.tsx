@@ -26,7 +26,7 @@ export function LanguageSwitch({ current, label }: { current: Locale; label: str
           onClick={() => choose(locale)}
           className={cn(
             "h-9 min-w-11 rounded-full px-3 text-sm font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-            locale === current ? "bg-background text-foreground shadow-sm" : "text-muted-foreground",
+            locale === current ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
           )}
         >
           {locale.toUpperCase()}

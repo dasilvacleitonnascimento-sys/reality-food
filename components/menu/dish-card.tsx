@@ -27,13 +27,12 @@ export function DishCard({
   return (
     <Link
       href={href}
-      className={cn(
-        "flex gap-4 rounded-xl py-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-        !dish.isAvailable && "opacity-60 grayscale",
-      )}
+      className="group -mx-2 flex gap-4 rounded-xl px-2 py-4 outline-none transition-colors hover:bg-card active:bg-card focus-visible:ring-3 focus-visible:ring-ring/50"
     >
       <div className="min-w-0 flex-1">
-        <h3 className="font-medium leading-snug">{dish.name}</h3>
+        <h3 className={cn("rf-serif text-[1.0625rem] leading-snug break-words", !dish.isAvailable && "text-muted-foreground")}>
+          {dish.name}
+        </h3>
         <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
           {dish.description}
         </p>
@@ -44,7 +43,9 @@ export function DishCard({
           </p>
         )}
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 font-semibold">{formatPrice(dish.price)}</span>
+          <span className={cn("mr-1 font-bold tabular-nums", !dish.isAvailable && "text-muted-foreground line-through")}>
+            {formatPrice(dish.price)}
+          </span>
           {!dish.isAvailable && (
             <Badge variant="destructive">{soldOutLabel}</Badge>
           )}
@@ -65,10 +66,11 @@ export function DishCard({
             fill
             sizes="112px"
             preload={preloadPhoto}
-            className="object-cover"
+            // Sold out: only the photo fades, so the text keeps full contrast.
+            className={cn("object-cover", !dish.isAvailable && "opacity-50 grayscale")}
           />
-          {has3d && (
-            <span className="absolute top-1.5 left-1.5 rounded-md bg-black/75 px-1.5 py-0.5 text-xs font-semibold text-white">
+          {has3d && dish.isAvailable && (
+            <span className="absolute top-1.5 left-1.5 rounded-md bg-(--rf-accent) px-1.5 py-0.5 text-xs font-bold text-(--rf-ink)">
               3D
             </span>
           )}

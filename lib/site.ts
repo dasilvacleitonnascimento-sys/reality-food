@@ -11,7 +11,7 @@ export const SITE = {
     dishesIncluded: 15,
   },
   demos: [
-    { slug: "ironside-cafe", name: "Ironside Cafe", note: "Full café menu · drinks and coffee in 3D" },
+    { slug: "ironside-cafe", name: "Ironside Cafe", note: "Full café menu, with drinks and coffee in 3D" },
     { slug: "demo-bistro", name: "Demo Bistro", note: "Real dishes scanned with a phone" },
   ],
 } as const;

@@ -16,7 +16,9 @@ export async function generateStaticParams() {
   return (await getMenuSlugs()).map((slug) => ({ slug }));
 }
 
-export async function generateMetadata(props: PageProps<"/[lang]/[slug]">): Promise<Metadata> {
+export async function generateMetadata(
+  props: PageProps<"/[lang]/[slug]">,
+): Promise<Metadata> {
   const { lang, slug } = await props.params;
   if (!isLocale(lang)) return {};
   const restaurant = await getMenu(slug, lang);
@@ -38,7 +40,11 @@ export default function MenuPage(props: PageProps<"/[lang]/[slug]">) {
   );
 }
 
-async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] }) {
+async function Menu({
+  params,
+}: {
+  params: PageProps<"/[lang]/[slug]">["params"];
+}) {
   const { lang, slug } = await params;
   if (!isLocale(lang)) notFound();
   const restaurant = await getMenu(slug, lang);
@@ -48,11 +54,11 @@ async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] 
   const preview = getPreview(slug);
 
   return (
-    <main
-      className="mx-auto w-full max-w-xl pb-16"
-    >
+    <main id="main" className="mx-auto w-full max-w-xl pb-16">
       {preview && (
-        <p className="border-b border-border px-4 py-2 text-center text-[11px] text-muted-foreground">{t.preview(restaurant.name)}</p>
+        <p className="border-b border-border px-4 py-2 text-center text-[11px] text-muted-foreground">
+          {t.preview(restaurant.name)}
+        </p>
       )}
       <MenuHeader
         restaurant={restaurant}
@@ -63,30 +69,37 @@ async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] 
       <CategoryTabs categories={restaurant.categories} label={t.categories} />
 
       {restaurant.categories.map((category, categoryIndex) => {
-        const dishes = restaurant.dishes.filter((d) => d.category === category.id);
+        const dishes = restaurant.dishes.filter(
+          (d) => d.category === category.id,
+        );
         return (
           <section
             key={category.id}
             id={category.id}
             aria-labelledby={`${category.id}-heading`}
-            className="scroll-mt-16 px-4 pt-6"
+            className="scroll-mt-16 px-4 pt-8"
           >
-            <h2 id={`${category.id}-heading`} className="text-lg font-semibold tracking-tight">
+            <h2 id={`${category.id}-heading`} className="rf-serif text-xl">
               {category.name}
             </h2>
-            <div className="divide-y">
+            <ul className="mt-1 divide-y">
               {dishes.map((dish, dishIndex) => (
-                <DishCard
-                  key={dish.id}
-                  dish={dish}
-                  // Keeps the diner's language even if cookies are blocked.
-                  href={`/${lang}/${restaurant.slug}/dish/${dish.id}`}
-                  soldOutLabel={t.soldOut}
-                  sizeLabel={dict.dish.sizeShort(dish.servedIn?.kind ?? "plate", formatPlateSize(dish.plateDiameterCm).split(" (")[0], dish.servedIn?.oz)}
-                  preloadPhoto={categoryIndex === 0 && dishIndex < 2}
-                />
+                <li key={dish.id}>
+                  <DishCard
+                    dish={dish}
+                    // Keeps the diner's language even if cookies are blocked.
+                    href={`/${lang}/${restaurant.slug}/dish/${dish.id}`}
+                    soldOutLabel={t.soldOut}
+                    sizeLabel={dict.dish.sizeShort(
+                      dish.servedIn?.kind ?? "plate",
+                      formatPlateSize(dish.plateDiameterCm).split(" (")[0],
+                      dish.servedIn?.oz,
+                    )}
+                    preloadPhoto={categoryIndex === 0 && dishIndex < 2}
+                  />
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
         );
       })}

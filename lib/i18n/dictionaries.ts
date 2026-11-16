@@ -8,6 +8,7 @@ type Vessel = "cup" | "glass" | "bowl" | "pan";
 const en = {
   site: {
     description: "See every dish on your table in 3D before you order.",
+    skipToContent: "Skip to content",
   },
   home: {
     tagline: "Let your guests see every dish on their table in 3D before they order.",
@@ -85,6 +86,7 @@ export type Dictionary = typeof en;
 const es: Dictionary = {
   site: {
     description: "Mira cada plato en tu mesa en 3D antes de pedir.",
+    skipToContent: "Saltar al contenido",
   },
   home: {
     tagline: "Deja que tus clientes vean cada plato en su mesa en 3D antes de pedir.",

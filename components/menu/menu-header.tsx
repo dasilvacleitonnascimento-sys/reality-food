@@ -50,8 +50,8 @@ export function MenuHeader({ restaurant, locale, text, logo }: Props) {
         className="size-14 shrink-0 rounded-full"
       />
       <div className="min-w-0 flex-1">
-        <h1 className="text-xl font-semibold tracking-tight">{restaurant.name}</h1>
-        <p className="text-sm text-muted-foreground">{restaurant.tagline}</p>
+        <h1 className="rf-serif text-2xl leading-tight break-words">{restaurant.name}</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">{restaurant.tagline}</p>
         {/* Reads ?table= on the client so the menu itself stays prerendered. */}
         <Suspense fallback={null}>
           <TableLabel label={text.table} />

@@ -16,7 +16,7 @@ export default function QrPage() {
   if (process.env.NODE_ENV === "production") notFound();
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
+    <main id="main" className="mx-auto w-full max-w-3xl px-4 py-8">
       <h1 className="text-2xl font-semibold tracking-tight">Dev QR codes</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Your phone must be on the same Wi-Fi as this computer.
@@ -73,7 +73,7 @@ async function QrCodes() {
         {codes.map(({ url, svg }) => (
           <li key={url} className="rounded-xl border p-4">
             <div
-              className="mx-auto w-56 bg-white"
+              className="mx-auto w-56 bg-(--rf-card)"
               role="img"
               aria-label={`QR code for ${url}`}
               dangerouslySetInnerHTML={{ __html: svg }}

@@ -12,6 +12,7 @@ type Props = {
 /** One-time tips before the camera opens, so diners don't get stuck on "Move iPhone to start". */
 export function ArGuide({ text, onOpen, onCancel }: Props) {
   const openRef = useRef<HTMLButtonElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const cancelRef = useRef(onCancel);
 
   useEffect(() => {
@@ -23,13 +24,31 @@ export function ArGuide({ text, onOpen, onCancel }: Props) {
     openRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") cancelRef.current();
+      // Keep keyboard focus inside the dialog (it has two buttons).
+      if (e.key === "Tab") {
+        const first = openRef.current;
+        const last = cancelButtonRef.current;
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/50 p-4 sm:items-center">
+    <div
+      className="fixed inset-0 z-40 flex items-end justify-center overscroll-contain bg-(--rf-deep)/70 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:items-center"
+      // Tapping outside the card closes it, like Escape.
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+    >
       <div
         role="dialog"
         aria-modal="true"
@@ -44,7 +63,7 @@ export function ArGuide({ text, onOpen, onCancel }: Props) {
           </div>
         </div>
 
-        <h2 id="ar-guide-title" className="text-xl font-semibold tracking-tight">
+        <h2 id="ar-guide-title" className="rf-serif text-2xl">
           {text.title}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">{text.body}</p>
@@ -61,14 +80,15 @@ export function ArGuide({ text, onOpen, onCancel }: Props) {
           ref={openRef}
           type="button"
           onClick={onOpen}
-          className="mt-6 h-14 w-full rounded-xl bg-(--brand) text-base font-semibold text-(--brand-foreground) outline-none focus-visible:ring-4 focus-visible:ring-ring/50"
+          className="mt-6 h-14 w-full rounded-xl bg-(--brand) text-base font-semibold text-(--brand-foreground) outline-none transition-[filter] hover:brightness-105 active:brightness-95 focus-visible:ring-4 focus-visible:ring-ring/50"
         >
           {text.open}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="mt-2 h-11 w-full rounded-xl text-sm font-medium text-muted-foreground outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+          ref={cancelButtonRef}
+          className="mt-2 h-11 w-full rounded-xl text-sm font-medium text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           {text.cancel}
         </button>

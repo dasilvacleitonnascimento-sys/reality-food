@@ -6,11 +6,11 @@ function Block({ className }: { className: string }) {
 
 export function MenuSkeleton() {
   return (
-    <main className="mx-auto w-full max-w-xl pb-16" aria-busy="true">
+    <main id="main" className="mx-auto w-full max-w-xl pb-16" aria-busy="true">
       <div className="flex items-center gap-4 px-4 pt-6 pb-4">
         <Block className="size-14 shrink-0 rounded-full" />
         <div className="flex-1 space-y-2">
-          <Block className="h-5 w-40" />
+          <Block className="h-6 w-40" />
           <Block className="h-4 w-56" />
         </div>
       </div>
@@ -35,7 +35,7 @@ export function MenuSkeleton() {
 
 export function DishSkeleton() {
   return (
-    <main className="mx-auto w-full max-w-xl pb-16" aria-busy="true">
+    <main id="main" className="mx-auto w-full max-w-xl pb-16" aria-busy="true">
       <div className="px-2 py-2">
         <Block className="h-11 w-24 rounded-full" />
       </div>

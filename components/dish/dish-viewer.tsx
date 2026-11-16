@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ModelViewerElement } from "@google/model-viewer";
+import { X } from "lucide-react";
 import type { FollowArSession, FollowArStatus } from "@/lib/ar/follow-ar";
 import { isFollowArSupported } from "@/lib/ar/support";
 import type { ViewerText } from "@/lib/i18n/dictionaries";
@@ -37,7 +38,7 @@ function markGuideSeen() {
 }
 
 const buttonClass =
-  "h-14 rounded-xl bg-(--brand) text-base font-semibold text-(--brand-foreground) shadow-lg outline-none focus-visible:ring-4 focus-visible:ring-white/70 disabled:opacity-60";
+  "h-14 rounded-xl bg-(--brand) text-base font-semibold text-(--brand-foreground) shadow-lg outline-none transition-[filter] hover:brightness-105 active:brightness-95 focus-visible:ring-4 focus-visible:ring-(--rf-paper)/70 disabled:opacity-60";
 
 export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
   const viewerRef = useRef<HTMLElement>(null);
@@ -199,11 +200,11 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(progress * 100)}
-            className="absolute inset-x-0 top-0 h-1 bg-black/10"
+            className="absolute inset-x-0 top-0 h-1 bg-foreground/10"
           >
             <div
-              className="h-full bg-(--brand) transition-[width] duration-200"
-              style={{ width: `${Math.max(progress, 0.05) * 100}%` }}
+              className="h-full origin-left bg-(--brand) transition-transform duration-200"
+              style={{ transform: `scaleX(${Math.max(progress, 0.05)})` }}
             />
           </div>
         )}
@@ -232,24 +233,28 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
       {/* Shown on top of the camera during follow AR (WebXR DOM overlay). */}
       <div
         ref={overlayRef}
-        className={followStatus ? "fixed inset-0 z-50 flex flex-col justify-between p-4 text-white" : "hidden"}
+        className={
+          followStatus
+            ? "fixed inset-0 z-50 flex flex-col justify-between px-[max(1rem,env(safe-area-inset-left))] pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] text-(--rf-paper)"
+            : "hidden"
+        }
       >
         {followStatus && (
           <>
             <div className="flex items-start justify-between gap-3">
-              <span className="rounded-full bg-black/60 px-3 py-1.5 text-sm font-semibold">{text.trueSize}</span>
+              <span className="rounded-full bg-(--rf-deep)/70 px-3 py-1.5 text-sm font-bold">{text.trueSize}</span>
               <button
                 type="button"
                 onClick={() => sessionRef.current?.end()}
-                className="size-11 shrink-0 rounded-full bg-black/60 text-xl font-semibold outline-none focus-visible:ring-4 focus-visible:ring-white/70"
+                className="grid size-11 shrink-0 place-items-center rounded-full bg-(--rf-deep)/70 outline-none focus-visible:ring-4 focus-visible:ring-(--rf-paper)/70"
                 aria-label={text.close}
               >
-                ✕
+                <X className="size-5" aria-hidden />
               </button>
             </div>
 
             <div className="flex flex-col items-center gap-3">
-              <p className="max-w-xs rounded-xl bg-black/60 px-4 py-2 text-center text-sm" aria-live="polite">
+              <p className="max-w-xs rounded-xl bg-(--rf-deep)/70 px-4 py-2 text-center text-sm" aria-live="polite">
                 {text.hints[followStatus]}
               </p>
               {(onTable || followStatus === "estimating") && (
@@ -258,8 +263,8 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
                     type="button"
                     onClick={toggleRuler}
                     aria-pressed={rulerOn}
-                    className={`h-14 shrink-0 rounded-xl px-4 text-base font-semibold outline-none focus-visible:ring-4 focus-visible:ring-white/70 ${
-                      rulerOn ? "bg-white text-black" : "bg-black/60 text-white"
+                    className={`h-14 shrink-0 rounded-xl px-4 text-base font-semibold outline-none focus-visible:ring-4 focus-visible:ring-(--rf-paper)/70 ${
+                      rulerOn ? "bg-(--rf-paper) text-(--rf-ink)" : "bg-(--rf-deep)/70 text-(--rf-paper)"
                     }`}
                   >
                     {text.ruler}

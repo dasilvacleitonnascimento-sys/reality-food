@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PlateRuler } from "@/components/measure/plate-ruler";
 
 export type CompareDish = { id: string; name: string; plateCm: number };
 
@@ -32,7 +33,7 @@ export function SizeCompare({ dishes, text }: Props) {
               className={`h-11 rounded-full border px-4 text-sm font-bold outline-none transition-colors focus-visible:ring-4 focus-visible:ring-(--rf-accent)/50 ${
                 active
                   ? "border-(--rf-accent) bg-(--rf-accent) text-(--rf-ink)"
-                  : "border-white/15 text-(--rf-paper) hover:border-(--rf-accent)"
+                  : "border-(--rf-dark-line) text-(--rf-paper) hover:border-(--rf-accent)"
               }`}
             >
               {dish.name}
@@ -41,7 +42,7 @@ export function SizeCompare({ dishes, text }: Props) {
         })}
       </div>
 
-      <div className="relative mt-8 aspect-[46/38] w-full overflow-hidden rounded-3xl border border-white/10 bg-(--rf-panel)">
+      <div className="relative mt-8 aspect-[46/38] w-full overflow-hidden rounded-2xl border border-(--rf-dark-line) bg-(--rf-panel)">
         {/* 1 cm grid, so the scale is visible */}
         <div
           className="absolute inset-0 opacity-[0.07]"
@@ -61,23 +62,21 @@ export function SizeCompare({ dishes, text }: Props) {
             transition: "width 0.7s cubic-bezier(0.2,0.7,0.2,1)",
           }}
         >
-          <div className="relative grid aspect-square place-items-center rounded-full bg-(--rf-paper) shadow-[0_20px_40px_-10px_rgba(0,0,0,0.6)]">
-            <div className="absolute inset-[13%] rounded-full border-2 border-(--rf-ink)/10 bg-[radial-gradient(circle_at_40%_35%,#fff,var(--rf-paper))]" />
+          <div className="relative grid aspect-square place-items-center rounded-full bg-(--rf-paper) shadow-[0_20px_40px_-10px_var(--rf-deep)]">
+            <div className="absolute inset-[13%] rounded-full border-2 border-(--rf-ink)/10 bg-[radial-gradient(circle_at_40%_35%,var(--rf-card),var(--rf-paper))]" />
             <p className="relative px-[18%] text-center text-[clamp(10px,2.4vw,16px)] leading-tight font-bold text-(--rf-ink)">
               {selected.name}
             </p>
           </div>
           {/* Ruler under the plate */}
           <div className="mt-[6%] flex flex-col items-center gap-1">
-            <div className="relative h-2.5 w-full border-x-2 border-(--rf-accent)">
-              <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-(--rf-accent)" />
-            </div>
+            {/* Same scale as the 1 cm grid behind it: every tick is a real centimeter. */}
+            <PlateRuler cm={selected.plateCm} className="h-2.5 text-(--rf-accent)" />
             <span
-              className="text-xs font-bold text-(--rf-accent) sm:text-sm"
+              className="text-xs font-bold text-(--rf-accent) tabular-nums sm:text-sm"
               aria-live="polite"
             >
-              {selected.plateCm} cm {text.plate} ·{" "}
-              {(selected.plateCm / 2.54).toFixed(1)} in
+              {selected.plateCm}&nbsp;cm {text.plate} ({(selected.plateCm / 2.54).toFixed(1)}&nbsp;in)
             </span>
           </div>
         </div>
@@ -90,7 +89,7 @@ export function SizeCompare({ dishes, text }: Props) {
           <div className="aspect-[7.15/14.67] rounded-[18%/9%] border-[3px] border-(--rf-paper)/80 bg-(--rf-ink) p-[6%]">
             <div className="h-full rounded-[14%/7%] bg-[linear-gradient(160deg,var(--rf-accent),var(--rf-accent-text))] opacity-80" />
           </div>
-          <p className="mt-2 text-center text-[11px] leading-tight text-(--rf-paper)/75 sm:text-xs">
+          <p className="mt-2 text-center text-[11px] leading-tight text-(--rf-dark-muted) sm:text-xs">
             {text.phone}
           </p>
         </div>

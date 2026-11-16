@@ -7,6 +7,7 @@ import { BackButton } from "@/components/dish/back-button";
 import { DishViewer } from "@/components/dish/dish-viewer";
 import { LanguageSwitch } from "@/components/menu/language-switch";
 import { PoweredBy } from "@/components/menu/powered-by";
+import { PlateRuler } from "@/components/measure/plate-ruler";
 import { Ruler } from "lucide-react";
 import { DishSkeleton } from "@/components/menu/skeletons";
 import { Badge } from "@/components/ui/badge";
@@ -56,9 +57,7 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
   if (dish.glbUrl) preload(dish.glbUrl, { as: "fetch", crossOrigin: "anonymous" });
 
   return (
-    <main
-      className="mx-auto w-full max-w-xl pb-16"
-    >
+    <main id="main" className="mx-auto w-full max-w-xl pb-16">
       <div className="flex items-center justify-between px-2 py-2">
         <BackButton fallbackHref={`/${lang}/${restaurant.slug}`} label={t.dish.back} />
         <LanguageSwitch current={lang} label={t.menu.language} />
@@ -87,8 +86,8 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
 
       <article className="px-4 pt-4">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-semibold tracking-tight">{dish.name}</h1>
-          <p className="pt-1 text-lg font-semibold">{formatPrice(dish.price)}</p>
+          <h1 className="rf-serif min-w-0 text-[1.75rem] leading-tight break-words">{dish.name}</h1>
+          <p className="shrink-0 pt-1 text-lg font-bold tabular-nums">{formatPrice(dish.price)}</p>
         </div>
 
         {(dish.tags.length > 0 || !dish.isAvailable) && (
@@ -102,11 +101,21 @@ async function Dish({ params }: { params: PageProps<"/[lang]/[slug]/dish/[id]">[
           </div>
         )}
 
-        <p className="mt-3 text-muted-foreground">{dish.description}</p>
-        <section aria-label={t.dish.sizeHeading} className="mt-5 flex gap-3 rounded-xl border border-(--brand)/60 bg-(--brand)/10 p-4">
-          <Ruler className="mt-0.5 size-5 shrink-0 text-(--brand-text)" aria-hidden />
-          <div className="text-sm">
-            <p className="font-semibold text-(--brand-text)">{t.dish.sizeHeading}</p>
+        <p className="mt-3 leading-relaxed text-muted-foreground">{dish.description}</p>
+        <section aria-labelledby="size-heading" className="mt-6 rounded-2xl border border-border bg-card p-4">
+          <h2 id="size-heading" className="flex items-center gap-2 text-sm font-bold text-(--brand-text)">
+            <Ruler className="size-4 shrink-0" aria-hidden />
+            {t.dish.sizeHeading}
+          </h2>
+          {/* The plate's width as a ruler, so "28 cm" reads as a length, not just a number. */}
+          <div className="mt-4">
+            <PlateRuler cm={dish.plateDiameterCm} />
+            <div className="mt-1.5 flex justify-between text-xs font-medium text-muted-foreground tabular-nums" aria-hidden>
+              <span>0</span>
+              <span>{dish.plateDiameterCm} cm</span>
+            </div>
+          </div>
+          <div className="mt-3 text-sm">
             {dish.portionCm && (
               <p className="mt-1">
                 {t.dish.portion(
