@@ -84,6 +84,60 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { USDZExporter } from "three/addons/exporters/USDZExporter.js";
 const post = (url, body) => fetch(url, { method: "POST", body });
+
+// A 15 cm gold ruler lying on the table in front of the dish (cm on top, inches
+// below), so diners can judge the size without holding their hand over it.
+const RULER = { length: 0.15, width: 0.026, thick: 0.0012 };
+function rulerTexture() {
+  const W = 2048;
+  const H = Math.round((W * RULER.width) / RULER.length);
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const g = c.getContext("2d");
+  g.fillStyle = "#FBB71A";
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = "#191A1F";
+  const pxPerCm = W / 15;
+  const margin = pxPerCm * 0.25;
+  const usable = W - margin * 2;
+  const cmPx = usable / 14.5;
+  g.font = "700 " + Math.round(H * 0.2) + "px Arial";
+  g.textBaseline = "top";
+  for (let mm = 0; mm <= 145; mm++) {
+    const x = margin + (mm / 10) * cmPx;
+    const len = mm % 10 === 0 ? 0.32 : mm % 5 === 0 ? 0.22 : 0.13;
+    g.fillRect(x - 1.5, 0, 3, H * len);
+    if (mm % 10 === 0 && mm > 0) g.fillText(String(mm / 10), x + 4, H * 0.06);
+  }
+  const inPx = cmPx * 2.54;
+  g.textBaseline = "bottom";
+  for (let s16 = 0; s16 <= 5.7 * 16; s16++) {
+    const x = margin + (s16 / 16) * inPx;
+    const len = s16 % 16 === 0 ? 0.3 : s16 % 8 === 0 ? 0.22 : s16 % 4 === 0 ? 0.15 : 0.08;
+    g.fillRect(x - 1.5, H * (1 - len), 3, H * len);
+    if (s16 % 16 === 0 && s16 > 0) g.fillText(String(s16 / 16), x + 4, H * 0.94);
+  }
+  g.textAlign = "right";
+  g.textBaseline = "middle";
+  g.font = "700 " + Math.round(H * 0.16) + "px Arial";
+  g.fillText("cm / in  ·  Reality Food", W - margin, H * 0.5);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+const rulerMap = rulerTexture();
+function addRuler(group, model) {
+  const box = new THREE.Box3().setFromObject(model);
+  const ruler = new THREE.Mesh(
+    new THREE.BoxGeometry(RULER.length, RULER.thick, RULER.width),
+    new THREE.MeshStandardMaterial({ map: rulerMap, roughness: 0.55, metalness: 0 }),
+  );
+  ruler.name = "ruler";
+  const cx = (box.min.x + box.max.x) / 2;
+  ruler.position.set(cx, box.min.y + RULER.thick / 2, box.max.z + 0.025 + RULER.width / 2);
+  group.add(ruler);
+}
 const models = await (await fetch("/list")).json();
 const loader = new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath("/public/draco/"));
 for (const glb of models) {
@@ -92,6 +146,8 @@ for (const glb of models) {
     // Same structure model-viewer exports: the model inside a plain group.
     const group = new THREE.Object3D();
     group.add(gltf.scene);
+    group.updateWorldMatrix(false, true);
+    addRuler(group, gltf.scene);
     group.updateWorldMatrix(false, true);
     const usdz = await new USDZExporter().parseAsync(group, { maxTextureSize: ${MAX_TEXTURE} });
     await post("/save?file=" + encodeURIComponent(glb.replace(/\\.glb$/, ".usdz")), usdz);

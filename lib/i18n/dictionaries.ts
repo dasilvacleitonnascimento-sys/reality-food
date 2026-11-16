@@ -68,7 +68,12 @@ const en = {
   guide: {
     title: "See it at true size",
     body: "Your phone needs a second to find the table.",
-    tips: ["Good light helps", "Aim at a table with some texture", "Move your phone slowly from side to side"],
+    tips: [
+      "Good light and a table with some texture help",
+      "Move your phone slowly from side to side",
+      "Hold it about 16 in (40 cm) from the table",
+      "Put your hand next to the plate, not over it",
+    ],
     open: "Open camera",
     cancel: "Not now",
   },
@@ -147,7 +152,12 @@ const es: Dictionary = {
   guide: {
     title: "Míralo en tamaño real",
     body: "Tu teléfono necesita un segundo para encontrar la mesa.",
-    tips: ["Con buena luz funciona mejor", "Apunta a una mesa con algo de textura", "Mueve el teléfono despacio de lado a lado"],
+    tips: [
+      "Con buena luz y una mesa con algo de textura funciona mejor",
+      "Mueve el teléfono despacio de lado a lado",
+      "Sostenlo a unos 40 cm (16 in) de la mesa",
+      "Pon la mano al lado del plato, no encima",
+    ],
     open: "Abrir cámara",
     cancel: "Ahora no",
   },
