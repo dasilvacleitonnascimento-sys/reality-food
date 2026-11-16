@@ -12,6 +12,7 @@ import { DishSkeleton } from "@/components/menu/skeletons";
 import { Badge } from "@/components/ui/badge";
 import { getDish } from "@/lib/demo-data";
 import { getDishParams, getMenu } from "@/lib/menu";
+import { getPreview } from "@/lib/previews";
 import { formatLength, formatPlateSize, formatPrice } from "@/lib/format";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary, getViewerText } from "@/lib/i18n/dictionaries";
@@ -28,6 +29,7 @@ export async function generateMetadata(props: PageProps<"/[lang]/[slug]/dish/[id
   if (!restaurant || !dish) return {};
   return {
     title: `${dish.name} | ${restaurant.name}`,
+    ...(getPreview(slug) ? { robots: { index: false, follow: false } } : {}),
     description: dish.description,
   };
 }

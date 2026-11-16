@@ -25,6 +25,7 @@ const en = {
     soldOut: "Sold out",
     language: "Language",
     poweredBy: "Menu by Reality Food",
+    preview: (restaurant: string) => `Preview prepared for ${restaurant} by Reality Food`,
   },
   dish: {
     back: "Menu",
@@ -101,6 +102,7 @@ const es: Dictionary = {
     soldOut: "Agotado",
     language: "Idioma",
     poweredBy: "Menú por Reality Food",
+    preview: (restaurant) => `Vista previa preparada para ${restaurant} por Reality Food`,
   },
   dish: {
     back: "Menú",

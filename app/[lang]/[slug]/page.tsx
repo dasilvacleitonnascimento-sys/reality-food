@@ -8,6 +8,7 @@ import { MenuSkeleton } from "@/components/menu/skeletons";
 import { PoweredBy } from "@/components/menu/powered-by";
 import { formatPlateSize } from "@/lib/format";
 import { getMenu, getMenuSlugs } from "@/lib/menu";
+import { getPreview } from "@/lib/previews";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 
@@ -23,6 +24,8 @@ export async function generateMetadata(props: PageProps<"/[lang]/[slug]">): Prom
   return {
     title: getDictionary(lang).menu.title(restaurant.name),
     description: restaurant.tagline,
+    // Sales previews aren't the restaurant's official menu yet: keep them out of search.
+    ...(getPreview(slug) ? { robots: { index: false, follow: false } } : {}),
   };
 }
 
@@ -42,12 +45,21 @@ async function Menu({ params }: { params: PageProps<"/[lang]/[slug]">["params"] 
   if (!restaurant) notFound();
   const dict = getDictionary(lang);
   const t = dict.menu;
+  const preview = getPreview(slug);
 
   return (
     <main
       className="mx-auto w-full max-w-xl pb-16"
     >
-      <MenuHeader restaurant={restaurant} locale={lang} text={{ table: t.table, language: t.language }} />
+      {preview && (
+        <p className="border-b border-border px-4 py-2 text-center text-[11px] text-muted-foreground">{t.preview(restaurant.name)}</p>
+      )}
+      <MenuHeader
+        restaurant={restaurant}
+        locale={lang}
+        text={{ table: t.table, language: t.language }}
+        logo={preview ? { src: preview.logo, wide: preview.wide } : undefined}
+      />
       <CategoryTabs categories={restaurant.categories} label={t.categories} />
 
       {restaurant.categories.map((category, categoryIndex) => {
