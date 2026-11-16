@@ -5,6 +5,22 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import QRCode from "qrcode";
 import { getRestaurants } from "@/lib/demo-data";
+import { getRestaurantSite } from "@/lib/restaurant-site";
+
+/** Every page worth opening on a phone: landing, each menu (with and without a table), websites, a 3D dish. */
+function testPages(): { label: string; path: string }[] {
+  const pages = [{ label: "Reality Food home page", path: "/" }];
+  for (const r of getRestaurants()) {
+    pages.push({ label: `${r.name} menu`, path: `/${r.slug}` });
+    pages.push({ label: `${r.name} menu, table 5`, path: `/${r.slug}?table=5` });
+    if (getRestaurantSite(r.slug)) pages.push({ label: `${r.name} website`, path: `/${r.slug}/site` });
+    // First dish with 3D (so the AR button can be tested right away), plus the chocolate cake showcase.
+    const in3d = r.dishes.filter((d) => d.glbUrl && d.isAvailable);
+    const picks = [in3d[0], in3d.find((d) => d.id === "chocolate-cake")].filter((d, i, all) => d && all.indexOf(d) === i);
+    for (const dish of picks) pages.push({ label: `${dish!.name} (3D + AR)`, path: `/${r.slug}/dish/${dish!.id}` });
+  }
+  return pages;
+}
 
 export const metadata: Metadata = {
   title: "Dev QR codes",
@@ -46,18 +62,19 @@ async function QrCodes() {
   const bases = lanAddresses.length
     ? lanAddresses.map((ip) => `http://${ip}:${port}`)
     : [`http://${host}`];
-  const slug = getRestaurants()[0].slug;
+  const pages = testPages();
 
   const codes = await Promise.all(
     bases.flatMap((base) =>
-      [`${base}/${slug}`, `${base}/${slug}?table=5`].map(async (url) => ({
-        url,
-        svg: await QRCode.toString(url, {
+      pages.map(async ({ label, path }) => {
+        const url = `${base}${path}`;
+        const svg = await QRCode.toString(url, {
           type: "svg",
           margin: 1,
           errorCorrectionLevel: "H",
-        }),
-      })),
+        });
+        return { label, url, svg };
+      }),
     ),
   );
 
@@ -70,8 +87,9 @@ async function QrCodes() {
         </p>
       )}
       <ul className="mt-6 grid gap-6 sm:grid-cols-2">
-        {codes.map(({ url, svg }) => (
+        {codes.map(({ label, url, svg }) => (
           <li key={url} className="rounded-xl border p-4">
+            <h2 className="mb-3 text-center font-semibold">{label}</h2>
             <div
               className="mx-auto w-56 bg-(--rf-card)"
               role="img"
