@@ -29,6 +29,17 @@ run anything from inside it.
    crop-scan finds the table height and the white plate, removes everything else,
    and with --replace-plate keeps only the scanned food on a clean, exact plate
    (white glazed plates scan badly). Without a white plate, crop in the app instead.
+
+   **Food served on paper, in a basket or tray, or a scan without real scale**
+   (crop-scan reports an absurd plate size, e.g. meters): keep only the food,
+   set its real width and put it on a clean plate:
+   ```bash
+   node scripts/food-only.mjs "<scan.obj|.glb>" <clean.glb> --food-cm <widest food cm> --plate-cm <plate cm>
+   ```
+   Ask the user to measure the food's widest size (bun, patty...) with a ruler;
+   if they can't, say clearly that the size is an estimate.
+   Menu photo from the model: `PREVIEW_WIDTH=1200 node scripts/preview-model.mjs <final.glb> <prefix>`,
+   then use `<prefix>-34.jpg`.
 1. Import and calibrate:
    ```bash
    npm run import-model -- "<scan.glb>" --plate <cm> --out <restaurant>/<dish-id>

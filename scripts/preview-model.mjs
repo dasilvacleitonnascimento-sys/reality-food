@@ -104,8 +104,9 @@ for (const [name, v] of Object.entries(views)) {
     target: [center[0], height * 0.3, center[2]],
     fov: v.fov,
     extent: size * 0.75,
-    width: 900,
-    height: 675,
+    // PREVIEW_WIDTH=1200 renders menu-card photos (4:3).
+    width: Number(process.env.PREVIEW_WIDTH) || 900,
+    height: Math.round((Number(process.env.PREVIEW_WIDTH) || 900) * 0.75),
   });
 }
 console.log(`${path.basename(input)}: ${(size * 100).toFixed(1)} cm wide, ${(height * 100).toFixed(1)} cm tall -> ${outPrefix}-top.jpg, ${outPrefix}-34.jpg`);

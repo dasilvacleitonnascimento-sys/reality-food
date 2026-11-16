@@ -109,6 +109,19 @@ export const demoBistro: Restaurant = {
       isAvailable: true,
     },
     {
+      id: "double-burger",
+      name: "Double Beef Burger",
+      description:
+        "Two juicy beef patties, crisp lettuce and a toasted brioche bun. Scanned from the real dish with a phone.",
+      price: 16,
+      category: "mains",
+      photo: "/images/burger.jpg",
+      glbUrl: "/models/demo-bistro/burger.glb",
+      plateDiameterCm: 23,
+      tags: ["Real scan"],
+      isAvailable: true,
+    },
+    {
       id: "chocolate-cake",
       name: "Triple Chocolate Cake",
       description:
@@ -158,6 +171,11 @@ export const demoBistro: Restaurant = {
           name: "Burrata con tomates heirloom",
           description:
             "Burrata cremosa, tomates heirloom y cherry, albahaca fresca, aceite de oliva y sal en escamas.",
+        },
+        "double-burger": {
+          name: "Hamburguesa doble de res",
+          description:
+            "Dos jugosas carnes de res, lechuga crujiente y pan brioche tostado. Escaneada del plato real con un teléfono.",
         },
         "schnitzel-plate": {
           name: "Plato de schnitzel de pollo",
