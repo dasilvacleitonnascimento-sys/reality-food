@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Checklist de escaneamento — Reality Food</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: Letter; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 11.5px/1.45 Manrope, system-ui, sans-serif; color: #191A1F; background: #E7E7E7; }
+  .page { width: 8.5in; height: 11in; padding: 0.45in 0.5in; display: flex; flex-direction: column; gap: 12px; }
+  header { display: flex; align-items: center; justify-content: space-between; background: #191A1F; color: #E7E7E7; border-radius: 16px; padding: 16px 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 600 20px Fraunces, Georgia, serif; }
+  .brand b { color: #FBB71A; font-weight: 600; }
+  h1 { margin: 0; font: 600 22px Fraunces, Georgia, serif; text-align: right; }
+  h1 small { display: block; font: 600 11px Manrope; color: #FBB71A; letter-spacing: .12em; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { background: #fff; border-radius: 14px; padding: 14px 16px; border: 1px solid #D2D2D6; }
+  .card.dark { background: #191A1F; color: #E7E7E7; border-color: #191A1F; }
+  h2 { margin: 0 0 8px; font: 800 12px Manrope; letter-spacing: .1em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  h2 .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #FBB71A; color: #191A1F; font-size: 12px; letter-spacing: 0; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { position: relative; padding: 3px 0 3px 22px; }
+  li::before { content: ""; position: absolute; left: 0; top: 5px; width: 12px; height: 12px; border: 1.8px solid #8A5A00; border-radius: 3px; }
+  .dark li::before { border-color: #FBB71A; }
+  li b { font-weight: 800; }
+  .why { color: #55565C; }
+  .dark .why { color: #A9AAB1; }
+  .orbits { display: flex; gap: 10px; align-items: flex-end; margin: 6px 0 2px; }
+  .orbit { flex: 1; text-align: center; font-size: 10.5px; }
+  .orbit svg { display: block; margin: 0 auto 2px; }
+  .no { color: #B3261E; font-weight: 800; }
+  footer { margin-top: auto; display: flex; justify-content: space-between; color: #55565C; font-size: 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <span class="brand">
+      <svg width="34" height="34" viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" fill="#FBB71A"/><g fill="none" stroke="#191A1F" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.6 0)"><path d="M17.6 44.5V19.5h8.9a6.45 6.45 0 0 1 0 12.9h-8.9M25.9 32.4l5.4 12.1"/><path d="M37.4 44.5V19.5h10.2M37.4 31.6h8.4"/></g></svg>
+      Reality <b>Food</b>
+    </span>
+    <h1><small>Para levar ao restaurante</small>Checklist de escaneamento</h1>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <h2><span class="n">1</span> Antes de começar</h2>
+      <ul>
+        <li><b>Autorização do dono</b> para escanear e usar os pratos.</li>
+        <li><b>RealityScan no modo "AR guidance"</b> <span class="why">— grava o tamanho real.</span></li>
+        <li><b>Meça o prato com a régua</b> (diâmetro) e anote.</li>
+        <li><b>Foto bonita do prato</b> em 45°, luz natural <span class="why">— vira a foto do cardápio.</span></li>
+        <li><b>Bateria e espaço</b> no celular (cada escaneamento ~200 fotos).</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2><span class="n">2</span> Montando a cena</h2>
+      <ul>
+        <li><b>Luz forte e uniforme</b>, perto de janela, <span class="no">sem sol direto</span>.</li>
+        <li><span class="no">Sem flash</span> e sem spot forte em cima do prato.</li>
+        <li><b>Mesa limpa:</b> tire QR code, copos, guardanapos e celulares.</li>
+        <li><b>Prato no centro</b>, com espaço para andar em volta.</li>
+        <li><span class="no">Nada de papel</span> embaixo da comida <span class="why">— escaneia com buracos.</span></li>
+        <li><b>Comida recém-servida</b>, antes de esfriar ou derreter.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="card dark">
+    <h2><span class="n">3</span> Escaneando: 3 voltas completas, devagar</h2>
+    <div class="orbits">
+      <div class="orbit">
+        <svg width="120" height="64" viewBox="0 0 120 64"><ellipse cx="60" cy="50" rx="34" ry="8" fill="none" stroke="#E7E7E7" stroke-width="2"/><ellipse cx="60" cy="22" rx="44" ry="10" fill="none" stroke="#FBB71A" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="104" cy="22" r="4" fill="#FBB71A"/></svg>
+        <b>Volta de cima</b> (~60°)
+      </div>
+      <div class="orbit">
+        <svg width="120" height="64" viewBox="0 0 120 64"><ellipse cx="60" cy="50" rx="34" ry="8" fill="none" stroke="#E7E7E7" stroke-width="2"/><ellipse cx="60" cy="38" rx="50" ry="12" fill="none" stroke="#FBB71A" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="110" cy="38" r="4" fill="#FBB71A"/></svg>
+        <b>Volta do meio</b> (~30°)
+      </div>
+      <div class="orbit">
+        <svg width="120" height="64" viewBox="0 0 120 64"><ellipse cx="60" cy="50" rx="34" ry="8" fill="none" stroke="#E7E7E7" stroke-width="2"/><ellipse cx="60" cy="52" rx="54" ry="9" fill="none" stroke="#FBB71A" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="114" cy="52" r="4" fill="#FBB71A"/></svg>
+        <b>Volta baixa</b> (quase na mesa)
+      </div>
+    </div>
+    <div class="grid" style="margin-top:8px">
+      <ul>
+        <li><b>Mesma distância</b> o tempo todo; o prato enchendo boa parte da tela.</li>
+        <li><b>Celular firme</b> — foto tremida vira mancha.</li>
+        <li><b>150 a 250 fotos</b> no total.</li>
+      </ul>
+      <ul>
+        <li><span class="no">Não mexa no prato</span> nem na mesa durante o escaneamento.</li>
+        <li><b>A volta baixa é a mais importante</b> <span class="why">— pega pão, recheio e a borda do prato.</span></li>
+        <li>Molho muito brilhante escaneia mal: escaneie logo que servir.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2><span class="n">4</span> Exportando</h2>
+      <ul>
+        <li><b>Qualidade máxima</b> (textura 8K).</li>
+        <li>Formato <b>OBJ ou GLB</b>, salvo em .zip.</li>
+        <li>Nome do arquivo = <b>nome do prato</b> (ex.: <i>pita-burger.zip</i>).</li>
+        <li>Confira no app se a comida aparece inteira, sem buracos grandes.</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2><span class="n">5</span> O que mandar para o Claude</h2>
+      <ul>
+        <li>O <b>.zip do escaneamento</b> na pasta Downloads.</li>
+        <li>O <b>diâmetro do prato</b> (régua) — ou a largura da comida, se for servida em papel/cesta.</li>
+        <li>A <b>foto de 45°</b> do prato.</li>
+        <li>Nome, descrição, preço e categoria do prato.</li>
+        <li>De qual restaurante é.</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer><span>Reality Food — Real food. Real size.</span><span>Dúvida no restaurante? Escaneie de novo: é mais rápido que consertar depois.</span></footer>
+</div>
+</body>
+</html>
