@@ -61,6 +61,10 @@
   --rf-accent: #fbb71a; /* golden yellow: buttons, highlights */
   --rf-accent-soft: #ffe3a3; /* light gold: glows, shimmer */
   --rf-accent-text: #8a5a00; /* dark gold: text/icons on ivory (4.8:1) */
+  --rf-deep: #111216; /* darkest band on dark pages */
+  --rf-dark-muted-bg: #2e2f36; /* chips, placeholders on charcoal */
+  --rf-dark-line: #36373e; /* borders on charcoal */
+  --rf-dark-muted: #a9aab1; /* secondary text on charcoal (7.6:1) */
   /* Buttons and highlights on diner menus. */
   --brand: var(--rf-accent);
   --brand-foreground: var(--rf-ink);
@@ -98,6 +102,29 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Dark diner pages (lib/theme.ts): charcoal background, ivory text, gold accents. */
+.rf-dark {
+  --background: var(--rf-ink);
+  --foreground: var(--rf-paper);
+  --card: var(--rf-panel);
+  --card-foreground: var(--rf-paper);
+  --popover: var(--rf-panel);
+  --popover-foreground: var(--rf-paper);
+  --primary: var(--rf-paper);
+  --primary-foreground: var(--rf-ink);
+  --secondary: var(--rf-dark-muted-bg);
+  --secondary-foreground: var(--rf-paper);
+  --muted: var(--rf-dark-muted-bg);
+  --muted-foreground: var(--rf-dark-muted);
+  --accent: var(--rf-dark-muted-bg);
+  --accent-foreground: var(--rf-paper);
+  --border: var(--rf-dark-line);
+  --input: var(--rf-dark-line);
+  --ring: var(--rf-accent);
+  --brand-text: var(--rf-accent);
+  color-scheme: dark;
 }
 
 .dark {

@@ -13,6 +13,7 @@ import { getMenu } from "@/lib/menu";
 import { getRestaurantSite } from "@/lib/restaurant-site";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { MENU_THEME } from "@/lib/theme";
 
 const serifFont = DM_Serif_Display({
   subsets: ["latin"],
@@ -50,7 +51,7 @@ export default function RestaurantSitePage(
   props: PageProps<"/[lang]/[slug]/site">,
 ) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-(--rf-paper)" />}>
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <RestaurantSite params={props.params} />
     </Suspense>
   );
@@ -72,10 +73,15 @@ async function RestaurantSite({
   const t = site.text[lang];
   const dict = getDictionary(lang);
   // Colors come from the shared Reality Food palette (app/globals.css).
+  // Theme colors flip with MENU_THEME (see .rf-dark in app/globals.css).
+  const dark = MENU_THEME === "dark";
   const ink = "var(--rf-ink)";
   const paper = "var(--rf-paper)";
+  const bg = "var(--background)";
+  const fg = "var(--foreground)";
+  const raised = "var(--card)";
   const accent = "var(--rf-accent)";
-  const accentText = "var(--rf-accent-text)";
+  const accentText = "var(--brand-text)";
   const soft = "var(--rf-accent-soft)";
   const alpha = (color: string, percent: number) => `color-mix(in srgb, ${color} ${percent}%, transparent)`;
   const byId = (id: string) => restaurant.dishes.find((d) => d.id === id);
@@ -90,11 +96,11 @@ async function RestaurantSite({
   return (
     <div
       className={`${serifFont.variable} ${sansFont.variable} min-h-screen [font-family:var(--font-site-sans),system-ui,sans-serif]`}
-      style={{ background: paper, color: ink }}
+      style={{ background: bg, color: fg }}
     >
       <header
         className="sticky top-0 z-20 border-b backdrop-blur"
-        style={{ background: alpha(paper, 90), borderColor: alpha(ink, 8) }}
+        style={{ background: alpha(bg, 90), borderColor: alpha(fg, 10) }}
       >
         <nav className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
           <a
@@ -155,7 +161,7 @@ async function RestaurantSite({
               <a
                 href={`tel:${site.phone.tel}`}
                 className={`${button} border-2`}
-                style={{ borderColor: alpha(ink, 15) }}
+                style={{ borderColor: alpha(fg, 20) }}
               >
                 <Phone className="size-4" aria-hidden />
                 {t.callCta}
@@ -168,7 +174,7 @@ async function RestaurantSite({
               <div className="relative">
                 <div
                   className="absolute inset-[8%] rounded-full"
-                  style={{ background: soft, opacity: 0.55 }}
+                  style={{ background: dark ? accent : soft, opacity: dark ? 0.14 : 0.55 }}
                   aria-hidden
                 />
                 <HeroDish
@@ -180,7 +186,7 @@ async function RestaurantSite({
               <figcaption className="mt-1 flex flex-col items-center gap-2 text-center">
                 <span
                   className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold"
-                  style={{ background: ink, color: accent }}
+                  style={dark ? { background: accent, color: ink } : { background: ink, color: accent }}
                 >
                   <Ruler className="size-4" aria-hidden />
                   {t.trueSize(plate(hero.plateDiameterCm))}
@@ -197,7 +203,7 @@ async function RestaurantSite({
         <section
           aria-labelledby="featured-heading"
           className="py-14"
-          style={{ background: "var(--rf-card)" }}
+          style={{ background: raised }}
         >
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 id="featured-heading" className={`${serif} text-4xl`}>
@@ -210,7 +216,7 @@ async function RestaurantSite({
                   <Link
                     href={`${menuHref}/dish/${dish.id}`}
                     className="group block overflow-hidden rounded-2xl border outline-none focus-visible:ring-4"
-                    style={{ borderColor: alpha(ink, 8), background: paper }}
+                    style={{ borderColor: alpha(fg, 10), background: bg }}
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
@@ -259,7 +265,7 @@ async function RestaurantSite({
             <Link
               href={menuHref}
               className={`${button} mt-8`}
-              style={{ background: ink, color: paper }}
+              style={{ background: fg, color: bg }}
             >
               {t.menuCta}
             </Link>
@@ -270,7 +276,7 @@ async function RestaurantSite({
         <section
           aria-labelledby="ar-heading"
           className="py-14"
-          style={{ background: ink, color: paper }}
+          style={{ background: dark ? "var(--rf-deep)" : ink, color: paper }}
         >
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 id="ar-heading" className={`${serif} max-w-xl text-4xl`}>
@@ -335,7 +341,7 @@ async function RestaurantSite({
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div
               className="rounded-3xl p-6 sm:p-10"
-              style={{ background: soft }}
+              style={dark ? { background: raised, border: `1px solid ${accent}` } : { background: soft }}
             >
               <h2 id="visit-heading" className={`${serif} text-4xl`}>
                 {t.visitTitle}

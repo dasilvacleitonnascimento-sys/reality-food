@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import { LOCALES, isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { MENU_THEME } from "@/lib/theme";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -34,7 +35,7 @@ export async function generateMetadata(props: LayoutProps<"/[lang]">): Promise<M
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#E7E7E7",
+  themeColor: MENU_THEME === "dark" ? "#191A1F" : "#E7E7E7",
 };
 
 export default async function RootLayout({ children, params }: LayoutProps<"/[lang]">) {
@@ -44,7 +45,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   return (
     <html lang={lang} suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       {/* suppressHydrationWarning: browser extensions (converters, translators, password managers) add attributes to <html>/<body> before React loads. Only these two tags, one level deep. */}
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className={`min-h-full flex flex-col ${MENU_THEME === "dark" ? "rf-dark" : ""}`} suppressHydrationWarning>
         {children}
       </body>
     </html>
