@@ -34,6 +34,16 @@ export function HeroStage({ dishes, text }: Props) {
   const [visible, setVisible] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const dish = dishes[index];
+  const currentUrl = useRef(dish.glbUrl);
+  useEffect(() => {
+    currentUrl.current = dish.glbUrl;
+  }, [dish.glbUrl]);
+
+  // Safety net: show the dish after a few seconds even if "load" never arrives.
+  useEffect(() => {
+    const fallback = setTimeout(() => setVisible(true), 6000);
+    return () => clearTimeout(fallback);
+  }, [index]);
 
   useEffect(() => {
     const globalConfig = window as unknown as {
@@ -50,31 +60,28 @@ export function HeroStage({ dishes, text }: Props) {
   useEffect(() => {
     const viewer = viewerRef.current;
     if (!viewer) return;
-    const onLoad = () => setVisible(true);
+    // Ignore a late "load" from the previous dish.
+    const onLoad = () => {
+      const src = (viewer as unknown as { src?: string }).src ?? "";
+      if (src === currentUrl.current || src.endsWith(currentUrl.current)) setVisible(true);
+    };
     viewer.addEventListener("load", onLoad);
     return () => viewer.removeEventListener("load", onLoad);
   }, []);
 
-  // Next dish every few seconds (not with reduced motion).
+  // Next dish CYCLE_MS after the current one is on screen (not with reduced motion).
   useEffect(() => {
-    if (
-      dishes.length < 2 ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
-      return;
+    if (!visible || dishes.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let swap: ReturnType<typeof setTimeout>;
-    const timer = setInterval(() => {
+    const timer = setTimeout(() => {
       setVisible(false);
-      swap = setTimeout(
-        () => setIndex((i) => (i + 1) % dishes.length),
-        FADE_MS,
-      );
+      swap = setTimeout(() => setIndex((i) => (i + 1) % dishes.length), FADE_MS);
     }, CYCLE_MS);
     return () => {
-      clearInterval(timer);
+      clearTimeout(timer);
       clearTimeout(swap);
     };
-  }, [dishes.length]);
+  }, [visible, dishes.length]);
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
     if (event.pointerType !== "mouse") return;

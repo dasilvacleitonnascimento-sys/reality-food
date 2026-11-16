@@ -5,7 +5,9 @@
 import type { Locale } from "./i18n/config";
 
 type SiteText = {
-  heroTitle: string;
+  heroTitle: [string, string];
+  pickDish: string;
+  onTheMenu: string;
   heroBody: string;
   menuCta: string;
   callCta: string;
@@ -47,7 +49,9 @@ const demoBistro: RestaurantSite = {
   phone: { display: "(305) 555-0142", tel: "+13055550142" },
   text: {
     en: {
-      heroTitle: "Seasonal plates, made from scratch.",
+      heroTitle: ["Seasonal plates,", "made from scratch."],
+      pickDish: "Pick a dish",
+      onTheMenu: "On the menu today",
       heroBody:
         "A neighborhood bistro with a menu you can see before you order: every dish in 3D, at its real size, right on your table.",
       menuCta: "See the menu in 3D",
@@ -92,7 +96,9 @@ const demoBistro: RestaurantSite = {
         "Demo restaurant made by Reality Food. Address and phone are examples.",
     },
     es: {
-      heroTitle: "Platos de temporada, hechos en casa.",
+      heroTitle: ["Platos de temporada,", "hechos en casa."],
+      pickDish: "Elige un plato",
+      onTheMenu: "Hoy en el menú",
       heroBody:
         "Un bistró de barrio con un menú que puedes ver antes de pedir: cada plato en 3D, en tamaño real, sobre tu mesa.",
       menuCta: "Ver el menú en 3D",

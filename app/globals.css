@@ -436,3 +436,43 @@ model-viewer::part(default-poster) {
     transform: none;
   }
 }
+
+/* Restaurant website motion (same palette). */
+@keyframes rf-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes rf-countdown {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes rf-zoom-slow {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+.rf-spin-slow {
+  animation: rf-turn 9s linear infinite;
+}
+.rf-countdown {
+  transform-origin: left;
+  animation: rf-countdown linear both;
+}
+.rf-zoom-slow {
+  animation: rf-zoom-slow 14s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rf-spin-slow,
+  .rf-countdown,
+  .rf-zoom-slow {
+    animation: none !important;
+  }
+}
