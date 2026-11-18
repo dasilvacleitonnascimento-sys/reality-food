@@ -122,6 +122,21 @@ export const demoBistro: Restaurant = {
       isAvailable: true,
     },
     {
+      // Scanned 2026-11-17 (RealityScan, iPhone 17 Pro). Plate size estimated from
+      // the scan (23 cm) until it's measured with a ruler.
+      id: "cheeseburger-fries",
+      name: "Cheeseburger & Curly Fries",
+      description:
+        "Beef patty with melted cheddar, lettuce, red onion and pickles on a toasted bun, served with seasoned curly fries. Scanned from the real dish with a phone.",
+      price: 18,
+      category: "mains",
+      photo: "/images/cheeseburger-fries.jpg",
+      glbUrl: "/models/demo-bistro/cheeseburger-fries.glb",
+      plateDiameterCm: 23,
+      tags: ["Real scan"],
+      isAvailable: true,
+    },
+    {
       id: "chocolate-cake",
       name: "Triple Chocolate Cake",
       description:
@@ -176,6 +191,11 @@ export const demoBistro: Restaurant = {
           name: "Hamburguesa doble de res",
           description:
             "Dos jugosas carnes de res, lechuga crujiente y pan brioche tostado. Escaneada del plato real con un teléfono.",
+        },
+        "cheeseburger-fries": {
+          name: "Hamburguesa con queso y papas rizadas",
+          description:
+            "Carne de res con cheddar derretido, lechuga, cebolla morada y pepinillos en pan tostado, con papas rizadas sazonadas. Escaneada del plato real con un teléfono.",
         },
         "schnitzel-plate": {
           name: "Plato de schnitzel de pollo",
