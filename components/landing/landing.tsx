@@ -1,57 +1,51 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Camera,
-  Check,
-  ChefHat,
-  Languages,
-  Ruler,
-  TrendingUp,
-} from "lucide-react";
+import { Camera, Check } from "lucide-react";
 import type { Locale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { formatPrice } from "@/lib/format";
+import { qrSvg } from "@/lib/qr";
 import { SITE } from "@/lib/site";
 import { getRestaurant } from "@/lib/demo-data";
 import { LanguageSwitch } from "@/components/menu/language-switch";
-import { HeroStage, type StageDish } from "./hero-stage";
+import { ArHero, type StageDish } from "./ar-hero";
+import { LiveBento } from "./live-bento";
+import { ScrollStory, type StoryDish } from "./scroll-story";
 import { SizeCompare } from "./size-compare";
 
 const COPY = {
   en: {
-    nav: {
-      how: "How it works",
-      size: "Size check",
-      pricing: "Pricing",
-    },
+    nav: { how: "How it works", size: "Size check", pricing: "Pricing", try: "Try it" },
     hero: {
       title: ["See it on your table", "before you order."],
       body: "Reality Food menus put every dish on the guest’s table at its real size. They scan the QR code, tap a dish and see it in 3D right where it will be served. No app. No guessing.",
-      primary: "Try the live menu",
+      primary: "See it on your table",
       secondary: "Book a demo",
+      qrTitle: "Try it on your table now",
+      qrBody: "Point your phone’s camera here. A real dessert lands on your table, at its real size.",
       note: "Works on iPhone and Android, in English and Spanish.",
       stage: {
-        trueSize: "True size",
-        plate: "plate",
+        scanning: "Looking for the table…",
+        found: "Table found",
+        placed: "True size on the table",
         loading: "Loading 3D dish",
+        dragHint: "Drag to turn the dish",
       },
     },
-    how: {
-      title: "Live in a day",
+    story: {
+      title: "From the QR code to the table in three taps",
       steps: [
-        {
-          title: "We scan your dishes",
-          body: "Your own plates, exactly as you serve them. Every model is checked to the millimeter against the plate.",
-        },
-        {
-          title: "QR codes on the tables",
-          body: "Your menu opens in the phone’s browser in seconds. Nothing to download.",
-        },
-        {
-          title: "Guests see it on the table",
-          body: "One tap and the dish appears in front of them, at its real size, next to their hand.",
-        },
+        { title: "Scan the table", body: "Guests point their phone at the QR code on the table. No app, no sign-up." },
+        { title: "Open the menu", body: "It opens in the browser, in English or Spanish. Dishes marked 3D can be seen on the table." },
+        { title: "See it on the table", body: "One tap and the dish lands next to their hand, at its real size, measured to the centimeter." },
       ],
+      text: { scanHint: "Point at the QR code", tableCard: "Scan for the 3D menu", trueSize: "True size on your table", tabs: ["Desserts", "Mains"] },
+    },
+    bento: {
+      title: "Everything a guest needs to say yes",
+      bilingual: { title: "English and Spanish, one QR code", body: "The menu follows each guest’s phone. Tap to switch." },
+      trueSize: { title: "Measured, not guessed", body: "Every model is checked against its plate, to within 0.5%." },
+      fast: { title: "Opens in seconds", body: "In the phone’s browser. Nothing to download.", loading: "Opening the menu…", ready: "Menu ready" },
     },
     size: {
       title: "“Is it big enough to share?”",
@@ -60,116 +54,61 @@ const COPY = {
       phone: "Phone, 14.7 cm",
       plate: "plate",
     },
-    why: {
-      title: "A menu that sells with its eyes",
-      items: [
-        {
-          icon: TrendingUp,
-          title: "Bigger checks",
-          body: "Guests who can see dessert order dessert. Premium plates stop looking like a risk.",
-        },
-        {
-          icon: Ruler,
-          title: "No surprises on size",
-          body: "“Is it big enough to share?” Answered before they order, with a ruler if they want one.",
-        },
-        {
-          icon: Languages,
-          title: "English and Spanish",
-          body: "The menu follows the guest’s phone language. One QR code for everyone.",
-        },
-        {
-          icon: ChefHat,
-          title: "Your team stays in control",
-          body: "Change prices, mark a dish sold out or add a special from your phone.",
-        },
-      ],
-    },
-    demos: {
-      title: "Try it now",
-      body: "Open a live menu on your phone and tap “View on your table”.",
-      open: "Open menu",
-    },
+    demos: { title: "Open a live menu", body: "On your phone, tap a dish and then “View on your table”.", open: "Open menu" },
     pricing: {
       title: "Simple pricing",
       setup: "Setup, once",
       monthlyLabel: "Monthly",
-      setupBody: (n: number) =>
-        `We scan up to ${n} dishes in 3D, design your menu and print QR cards for your tables.`,
+      setupBody: (n: number) => `We scan up to ${n} dishes in 3D, design your menu and print QR cards for your tables.`,
       monthly: "per month",
-      monthlyBody:
-        "Hosting, menu edits from your phone, monthly view reports and support.",
+      monthlyBody: "Hosting for your 3D menu and support.",
       includesTitle: "Included",
-      includes: [
-        "English and Spanish menu",
-        "Unlimited menu edits",
-        "True-size check on every dish",
-        "Works on iPhone and Android",
-      ],
+      includes: ["English and Spanish menu", "True-size check on every dish", "Works on iPhone and Android"],
       cta: "Get started",
     },
     faq: {
       title: "Questions",
       items: [
-        [
-          "Do guests need an app?",
-          "No. They scan the QR code and the menu opens in the browser. On iPhone the 3D view uses Apple’s built-in AR; on Android it runs right in Chrome.",
-        ],
-        [
-          "How accurate is the size?",
-          "Each model is calibrated to the plate you serve it on and rejected if it’s off by more than 0.5%. On the table, accuracy depends on the phone’s camera; recent phones are within a few percent.",
-        ],
-        [
-          "What if my menu changes?",
-          "Prices, descriptions and availability change from your phone in seconds. New dishes are scanned in a short visit.",
-        ],
-        [
-          "Do I need special equipment?",
-          "No. We scan with a phone, and your guests use their own.",
-        ],
+        ["Do guests need an app?", "No. They scan the QR code and the menu opens in the browser. On iPhone the 3D view uses Apple’s built-in AR; on Android it runs right in Chrome."],
+        ["How accurate is the size?", "Each model is calibrated to the plate you serve it on and rejected if it’s off by more than 0.5%. On the table, accuracy depends on the phone’s camera; recent phones are within a few percent."],
+        ["Do I need special equipment?", "No. We scan with a phone, and your guests use their own."],
       ],
     },
-    final: {
-      title: "Real food. Real size.",
-      body: "Give every guest a look at the plate before it reaches the table.",
-      cta: "See a live menu",
-    },
+    final: { title: "Real food. Real size.", body: "Give every guest a look at the plate before it reaches the table.", cta: "See a live menu", qr: "Or scan to try it on your table" },
     footer: "Real food. Real size.",
   },
   es: {
-    nav: {
-      how: "Cómo funciona",
-      size: "Tamaño",
-      pricing: "Precios",
-    },
+    nav: { how: "Cómo funciona", size: "Tamaño", pricing: "Precios", try: "Pruébalo" },
     hero: {
       title: ["Míralo en tu mesa", "antes de pedir."],
       body: "Los menús de Reality Food ponen cada plato sobre la mesa del cliente, en su tamaño real. Escanean el QR, tocan un plato y lo ven en 3D justo donde lo van a servir. Sin app. Sin adivinar.",
-      primary: "Prueba el menú en vivo",
+      primary: "Míralo en tu mesa",
       secondary: "Agenda una demo",
+      qrTitle: "Pruébalo ahora en tu mesa",
+      qrBody: "Apunta la cámara de tu teléfono aquí. Un postre real aparece en tu mesa, en su tamaño real.",
       note: "Funciona en iPhone y Android, en inglés y español.",
       stage: {
-        trueSize: "Tamaño real",
-        plate: "de plato",
+        scanning: "Buscando la mesa…",
+        found: "Mesa encontrada",
+        placed: "Tamaño real en la mesa",
         loading: "Cargando plato en 3D",
+        dragHint: "Arrastra para girar el plato",
       },
     },
-    how: {
-      title: "Listo en un día",
+    story: {
+      title: "Del QR a la mesa en tres toques",
       steps: [
-        {
-          title: "Escaneamos tus platos",
-          body: "Tus propios platos, tal como los sirves. Cada modelo se verifica al milímetro con el plato.",
-        },
-        {
-          title: "QR en las mesas",
-          body: "Tu menú abre en el navegador del teléfono en segundos. Nada que descargar.",
-        },
-        {
-          title: "Lo ven en su mesa",
-          body: "Un toque y el plato aparece frente a ellos, en tamaño real, junto a su mano.",
-        },
+        { title: "Escanean la mesa", body: "Tus clientes apuntan el teléfono al QR de la mesa. Sin app, sin registro." },
+        { title: "Abren el menú", body: "Se abre en el navegador, en inglés o español. Los platos con 3D se pueden ver en la mesa." },
+        { title: "Lo ven en la mesa", body: "Un toque y el plato aparece junto a su mano, en tamaño real, medido al centímetro." },
       ],
+      text: { scanHint: "Apunta al código QR", tableCard: "Escanea para ver el menú 3D", trueSize: "Tamaño real en tu mesa", tabs: ["Postres", "Platos fuertes"] },
+    },
+    bento: {
+      title: "Todo lo que un cliente necesita para decir que sí",
+      bilingual: { title: "Inglés y español, un solo QR", body: "El menú sigue el teléfono de cada cliente. Toca para cambiar." },
+      trueSize: { title: "Medido, no adivinado", body: "Cada modelo se verifica con su plato, con un margen de 0,5%." },
+      fast: { title: "Abre en segundos", body: "En el navegador del teléfono. Nada que descargar.", loading: "Abriendo el menú…", ready: "Menú listo" },
     },
     size: {
       title: "“¿Alcanza para compartir?”",
@@ -178,80 +117,27 @@ const COPY = {
       phone: "Teléfono, 14,7 cm",
       plate: "de plato",
     },
-    why: {
-      title: "Un menú que vende por los ojos",
-      items: [
-        {
-          icon: TrendingUp,
-          title: "Cuentas más altas",
-          body: "Quien ve el postre, pide el postre. Los platos premium dejan de parecer un riesgo.",
-        },
-        {
-          icon: Ruler,
-          title: "Sin sorpresas de tamaño",
-          body: "“¿Alcanza para compartir?” Respondido antes de pedir, con regla si la quieren.",
-        },
-        {
-          icon: Languages,
-          title: "Inglés y español",
-          body: "El menú sigue el idioma del teléfono. Un solo QR para todos.",
-        },
-        {
-          icon: ChefHat,
-          title: "Tu equipo tiene el control",
-          body: "Cambia precios, marca un plato agotado o agrega un especial desde tu teléfono.",
-        },
-      ],
-    },
-    demos: {
-      title: "Pruébalo ahora",
-      body: "Abre un menú en vivo en tu teléfono y toca “Ver en tu mesa”.",
-      open: "Abrir menú",
-    },
+    demos: { title: "Abre un menú en vivo", body: "En tu teléfono, toca un plato y luego “Ver en tu mesa”.", open: "Abrir menú" },
     pricing: {
       title: "Precios simples",
       setup: "Instalación, una vez",
       monthlyLabel: "Mensual",
-      setupBody: (n: number) =>
-        `Escaneamos hasta ${n} platos en 3D, diseñamos tu menú e imprimimos tarjetas QR para tus mesas.`,
+      setupBody: (n: number) => `Escaneamos hasta ${n} platos en 3D, diseñamos tu menú e imprimimos tarjetas QR para tus mesas.`,
       monthly: "al mes",
-      monthlyBody:
-        "Hosting, cambios del menú desde tu teléfono, reportes mensuales de vistas y soporte.",
+      monthlyBody: "Hosting de tu menú 3D y soporte.",
       includesTitle: "Incluye",
-      includes: [
-        "Menú en inglés y español",
-        "Cambios ilimitados",
-        "Verificación de tamaño real en cada plato",
-        "Funciona en iPhone y Android",
-      ],
+      includes: ["Menú en inglés y español", "Verificación de tamaño real en cada plato", "Funciona en iPhone y Android"],
       cta: "Empezar",
     },
     faq: {
       title: "Preguntas",
       items: [
-        [
-          "¿Mis clientes necesitan una app?",
-          "No. Escanean el QR y el menú abre en el navegador. En iPhone el 3D usa la realidad aumentada de Apple; en Android funciona directo en Chrome.",
-        ],
-        [
-          "¿Qué tan exacto es el tamaño?",
-          "Cada modelo se calibra con el plato en que lo sirves y se rechaza si se desvía más de 0,5%. En la mesa, la precisión depende de la cámara del teléfono; los teléfonos recientes están dentro de unos pocos por ciento.",
-        ],
-        [
-          "¿Y si cambia mi menú?",
-          "Precios, descripciones y disponibilidad se cambian desde tu teléfono en segundos. Los platos nuevos se escanean en una visita corta.",
-        ],
-        [
-          "¿Necesito equipo especial?",
-          "No. Escaneamos con un teléfono, y tus clientes usan el suyo.",
-        ],
+        ["¿Mis clientes necesitan una app?", "No. Escanean el QR y el menú abre en el navegador. En iPhone el 3D usa la realidad aumentada de Apple; en Android funciona directo en Chrome."],
+        ["¿Qué tan exacto es el tamaño?", "Cada modelo se calibra con el plato en que lo sirves y se rechaza si se desvía más de 0,5%. En la mesa, la precisión depende de la cámara del teléfono; los teléfonos recientes están dentro de unos pocos por ciento."],
+        ["¿Necesito equipo especial?", "No. Escaneamos con un teléfono, y tus clientes usan el suyo."],
       ],
     },
-    final: {
-      title: "Comida real. Tamaño real.",
-      body: "Deja que cada cliente vea el plato antes de que llegue a la mesa.",
-      cta: "Ver un menú en vivo",
-    },
+    final: { title: "Comida real. Tamaño real.", body: "Deja que cada cliente vea el plato antes de que llegue a la mesa.", cta: "Ver un menú en vivo", qr: "O escanea para probarlo en tu mesa" },
     footer: "Comida real. Tamaño real.",
   },
 } as const;
@@ -266,23 +152,8 @@ function Mark({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden>
       <circle cx="32" cy="32" r="29" fill="var(--rf-accent)" />
-      <circle
-        cx="32"
-        cy="32"
-        r="23.6"
-        fill="none"
-        stroke="var(--rf-ink)"
-        strokeWidth="1.5"
-        opacity="0.35"
-      />
-      <g
-        fill="none"
-        stroke="var(--rf-ink)"
-        strokeWidth="4.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        transform="translate(-0.6 0)"
-      >
+      <circle cx="32" cy="32" r="23.6" fill="none" stroke="var(--rf-ink)" strokeWidth="1.5" opacity="0.35" />
+      <g fill="none" stroke="var(--rf-ink)" strokeWidth="4.8" strokeLinecap="round" strokeLinejoin="round" transform="translate(-0.6 0)">
         <path d="M17.6 44.5V19.5h8.9a6.45 6.45 0 0 1 0 12.9h-8.9M25.9 32.4l5.4 12.1" />
         <path d="M37.4 44.5V19.5h10.2M37.4 31.6h8.4" />
       </g>
@@ -301,50 +172,65 @@ function Wordmark() {
   );
 }
 
-export function Landing({ locale }: { locale: Locale }) {
+/** Scan-to-try card: shown on larger screens, where the visitor isn't holding the phone yet. */
+function TryQr({ svg, title, body }: { svg: string; title: string; body?: string }) {
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border border-(--rf-dark-line) bg-(--rf-panel) p-3 pr-5">
+      <div className="size-24 shrink-0 rounded-xl bg-(--rf-card) p-2 text-(--rf-ink) [&_svg]:h-full [&_svg]:w-full" role="img" aria-label={title} dangerouslySetInnerHTML={{ __html: svg }} />
+      <div>
+        <p className="font-bold text-(--rf-paper)">{title}</p>
+        {body && <p className="mt-1 max-w-xs text-sm leading-relaxed text-(--rf-dark-muted)">{body}</p>}
+      </div>
+    </div>
+  );
+}
+
+export async function Landing({ locale }: { locale: Locale }) {
   const t = COPY[locale];
   const dict = getDictionary(locale);
   const demoHref = `/${SITE.demos[0].slug}`;
-  const contactHref = SITE.salesEmail
-    ? `mailto:${SITE.salesEmail}?subject=Reality%20Food%20demo`
-    : demoHref;
+  const tryHref = `/${SITE.tryDish.slug}/dish/${SITE.tryDish.id}`;
+  const contactHref = SITE.salesEmail ? `mailto:${SITE.salesEmail}?subject=Reality%20Food%20demo` : demoHref;
 
   // Real dishes from the demo menus (same 3D files the menus use).
   const bistro = getRestaurant("demo-bistro", locale)!;
+  const bistroEn = getRestaurant("demo-bistro", "en")!;
+  const bistroEs = getRestaurant("demo-bistro", "es")!;
   const ironside = getRestaurant("ironside-cafe", locale)!;
   const plated = bistro.dishes.filter((d) => d.glbUrl);
-  const stageDishes: StageDish[] = [
-    "double-burger",
-    "chocolate-cake",
-    "schnitzel-plate",
-    "pudim-slice",
-  ]
-    .map((id) => plated.find((d) => d.id === id))
+  const byId = (id: string) => bistro.dishes.find((d) => d.id === id);
+  const stageDishes: StageDish[] = ["chocolate-cake", "double-burger", "schnitzel-plate", "pudim-slice"]
+    .map(byId)
+    .filter((d) => d !== undefined && Boolean(d.glbUrl))
+    .map((d) => ({ name: d!.name, glbUrl: d!.glbUrl!, plateCm: d!.plateDiameterCm }));
+  const compareDishes = [...plated].sort((a, b) => a.plateDiameterCm - b.plateDiameterCm).map((d) => ({ id: d.id, name: d.name, plateCm: d.plateDiameterCm }));
+  const cake = byId(SITE.tryDish.id)!;
+  const storyDishes: StoryDish[] = ["schnitzel-plate", "double-burger", "chocolate-cake"]
+    .map(byId)
     .filter((d) => d !== undefined)
     .map((d) => ({
-      name: d.name,
-      glbUrl: d.glbUrl!,
-      plateCm: d.plateDiameterCm,
+      name: d!.name,
+      price: formatPrice(d!.price),
+      photo: d!.photo,
+      size: dict.dish.sizeShort("plate", `${d!.plateDiameterCm} cm`),
+      has3d: Boolean(d!.glbUrl),
     }));
-  const compareDishes = [...plated]
-    .sort((a, b) => a.plateDiameterCm - b.plateDiameterCm)
-    .map((d) => ({ id: d.id, name: d.name, plateCm: d.plateDiameterCm }));
+  const pickBoth = (id: string) => ({
+    en: { name: bistroEn.dishes.find((d) => d.id === id)!.name, description: bistroEn.dishes.find((d) => d.id === id)!.description },
+    es: { name: bistroEs.dishes.find((d) => d.id === id)!.name, description: bistroEs.dishes.find((d) => d.id === id)!.description },
+  });
   const demoPhotos: Record<string, string[]> = {
-    "ironside-cafe": ironside.dishes
-      .filter((d) => d.glbUrl)
-      .slice(0, 3)
-      .map((d) => d.photo),
-    "demo-bistro": [
-      "/images/schnitzel-plate.jpg",
-      "/images/burger.jpg",
-      "/images/chocolate-cake.jpg",
-    ],
+    "ironside-cafe": ironside.dishes.filter((d) => d.glbUrl).slice(0, 3).map((d) => d.photo),
+    "demo-bistro": ["/images/schnitzel-plate.jpg", "/images/burger.jpg", "/images/chocolate-cake.jpg"],
   };
+
+  // QR codes: "try it on your table" opens the cake; the table card opens the menu.
+  const [tryQr, menuQr] = await Promise.all([qrSvg(`${SITE.url}${tryHref}`), qrSvg(`${SITE.url}/${SITE.tryDish.slug}`)]);
 
   return (
     <div className="overflow-x-clip bg-(--rf-paper) text-(--rf-ink)">
       {/* --- Nav ---------------------------------------------------------------- */}
-      <header className="sticky top-0 z-40 border-b border-(--rf-dark-line) bg-(--rf-ink)/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-(--rf-dark-line) bg-(--rf-ink)/85 backdrop-blur-md">
         <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Wordmark />
           <div className="flex items-center gap-1 sm:gap-2">
@@ -362,14 +248,17 @@ export function Landing({ locale }: { locale: Locale }) {
               </a>
             ))}
             <LanguageSwitch current={locale} label={dict.menu.language} />
+            <Link href={tryHref} className="ml-1 hidden h-10 items-center rounded-lg bg-(--rf-accent) px-4 text-sm font-bold text-(--rf-ink) outline-none transition-[filter] hover:brightness-105 focus-visible:ring-3 focus-visible:ring-(--rf-accent)/50 sm:inline-flex">
+              {t.nav.try}
+            </Link>
           </div>
         </nav>
       </header>
 
       <main id="main">
-        {/* --- Hero: one moment, the ruler measuring a real dish --------------------- */}
+        {/* --- Hero: the camera's view of a table, a real dish landing on it --------- */}
         <section className="bg-(--rf-ink) text-(--rf-paper)">
-          <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 pt-12 pb-20 sm:px-6 md:grid-cols-[1.15fr_1fr] md:pt-20 md:pb-28">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-10 pb-20 sm:px-6 md:grid-cols-[1.1fr_1fr] md:pt-20 md:pb-28">
             <div>
               <h1 className="rf-serif text-[2.7rem] leading-[1.03] sm:text-6xl">
                 {/* Two lines on wide screens; one flowing sentence on phones. */}
@@ -379,108 +268,62 @@ export function Landing({ locale }: { locale: Locale }) {
                   </span>
                 ))}
               </h1>
-              <p className="mt-6 max-w-lg text-lg leading-relaxed text-(--rf-dark-muted)">
-                {t.hero.body}
-              </p>
+              <p className="mt-6 max-w-lg text-lg leading-relaxed text-(--rf-dark-muted)">{t.hero.body}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href={demoHref} className={btnPrimary}>
+                <Link href={tryHref} className={btnPrimary}>
                   {t.hero.primary}
                 </Link>
-                <a
-                  href={contactHref}
-                  className={`${btn} border border-(--rf-dark-line) hover:border-(--rf-accent)`}
-                >
+                <a href={contactHref} className={`${btn} border border-(--rf-dark-line) hover:border-(--rf-accent)`}>
                   {t.hero.secondary}
                 </a>
+              </div>
+              <div className="mt-8 hidden md:block">
+                <TryQr svg={tryQr} title={t.hero.qrTitle} body={t.hero.qrBody} />
               </div>
               <p className="mt-6 flex items-center gap-2 text-sm text-(--rf-dark-muted)">
                 <Camera className="size-4 shrink-0 text-(--rf-accent)" aria-hidden />
                 {t.hero.note}
               </p>
             </div>
-            <HeroStage dishes={stageDishes} text={t.hero.stage} />
+            <ArHero dishes={stageDishes} text={t.hero.stage} />
           </div>
-
         </section>
 
-        {/* --- How it works: a real sequence, so the steps are numbered ------------- */}
-        <section
-          id="how"
-          aria-labelledby="how-heading"
-          className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6"
-        >
-          <h2 id="how-heading" className={sectionTitle}>
-            {t.how.title}
-          </h2>
-          <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
-            {t.how.steps.map(({ title, body }, i) => (
-              <li key={title} className="border-t-2 border-(--rf-ink) pt-5">
-                <span
-                  className="rf-serif block text-5xl leading-none text-(--rf-accent-text) tabular-nums"
-                  aria-hidden
-                >
-                  {i + 1}
-                </span>
-                <h3 className="mt-4 text-xl font-bold">{title}</h3>
-                <p className="mt-2 leading-relaxed text-(--rf-muted)">{body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
+        {/* --- How it works: one pinned scene, driven by scroll --------------------- */}
+        <ScrollStory
+          title={t.story.title}
+          steps={t.story.steps}
+          restaurant={bistro.name}
+          dishes={storyDishes}
+          qrSvg={menuQr}
+          ar={{ photo: cake.photo, plateCm: cake.plateDiameterCm, label: `Ø ${cake.plateDiameterCm} cm` }}
+          text={t.story.text}
+        />
+
+        {/* --- Live demos of what the menu does ------------------------------------ */}
+        <LiveBento
+          text={t.bento}
+          bilingual={pickBoth(SITE.tryDish.id)}
+          dish={{ photo: cake.photo, name: cake.name, price: cake.price, plateCm: cake.plateDiameterCm }}
+        />
+
+
 
         {/* --- Size check (interactive) ------------------------------------------ */}
-        <section
-          id="size"
-          aria-labelledby="size-heading"
-          className="scroll-mt-20 bg-(--rf-ink) text-(--rf-paper)"
-        >
+        <section id="size" aria-labelledby="size-heading" className="scroll-mt-20 bg-(--rf-ink) text-(--rf-paper)">
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-24 sm:px-6 lg:grid-cols-[1fr_1.4fr]">
             <div>
               <h2 id="size-heading" className={sectionTitle}>
                 {t.size.title}
               </h2>
-              <p className="mt-4 text-lg leading-relaxed text-(--rf-dark-muted)">
-                {t.size.body}
-              </p>
+              <p className="mt-4 text-lg leading-relaxed text-(--rf-dark-muted)">{t.size.body}</p>
             </div>
-            <SizeCompare
-              dishes={compareDishes}
-              text={{
-                pick: t.size.pick,
-                phone: t.size.phone,
-                plate: t.size.plate,
-              }}
-            />
+            <SizeCompare dishes={compareDishes} text={{ pick: t.size.pick, phone: t.size.phone, plate: t.size.plate }} />
           </div>
         </section>
 
-        {/* --- Why it sells ------------------------------------------------------ */}
-        <section
-          aria-labelledby="why-heading"
-          className="mx-auto max-w-6xl px-4 py-24 sm:px-6"
-        >
-          <h2 id="why-heading" className={sectionTitle}>
-            {t.why.title}
-          </h2>
-          <ul className="mt-12 grid gap-x-10 gap-y-10 sm:grid-cols-2">
-            {t.why.items.map(({ icon: Icon, title, body }) => (
-              <li key={title} className="flex gap-4 border-t border-(--rf-line) pt-6">
-                <Icon className="mt-1 size-6 shrink-0 text-(--rf-accent-text)" aria-hidden />
-                <div>
-                  <h3 className="text-xl font-bold">{title}</h3>
-                  <p className="mt-1.5 leading-relaxed text-(--rf-muted)">{body}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-
         {/* --- Live demos -------------------------------------------------------- */}
-        <section
-          id="demo"
-          aria-labelledby="demo-heading"
-          className="scroll-mt-20 border-y border-(--rf-line) bg-(--rf-card)"
-        >
+        <section id="demo" aria-labelledby="demo-heading" className="scroll-mt-20 border-b border-(--rf-line) bg-(--rf-card)">
           <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
             <h2 id="demo-heading" className={sectionTitle}>
               {t.demos.title}
@@ -497,19 +340,10 @@ export function Landing({ locale }: { locale: Locale }) {
                       {demoPhotos[demo.slug]?.map((src, p) => (
                         <div
                           key={src}
-                          className="absolute top-1/2 left-1/2 h-32 w-40 overflow-hidden rounded-2xl border-4 border-(--rf-ink)"
-                          style={{
-                            transform: `translate(-50%, -50%) translateX(${(p - 1) * 70}px) rotate(${(p - 1) * 8}deg)`,
-                            zIndex: p === 1 ? 2 : 1,
-                          }}
+                          className="absolute top-1/2 left-1/2 h-32 w-40 overflow-hidden rounded-2xl border-4 border-(--rf-ink) transition-transform duration-500 motion-reduce:transition-none"
+                          style={{ transform: `translate(-50%, -50%) translateX(${(p - 1) * 70}px) rotate(${(p - 1) * 8}deg)`, zIndex: p === 1 ? 2 : 1 }}
                         >
-                          <Image
-                            src={src}
-                            alt=""
-                            fill
-                            sizes="160px"
-                            className="object-cover"
-                          />
+                          <Image src={src} alt="" fill sizes="160px" className="object-cover" />
                         </div>
                       ))}
                     </div>
@@ -520,9 +354,7 @@ export function Landing({ locale }: { locale: Locale }) {
                         </h3>
                         <p className="mt-1 text-sm text-(--rf-muted)">{demo.note}</p>
                       </div>
-                      <span className="inline-flex shrink-0 items-center rounded-xl bg-(--rf-ink) px-4 py-2.5 text-sm font-bold text-(--rf-accent)">
-                        {t.demos.open}
-                      </span>
+                      <span className="inline-flex shrink-0 items-center rounded-xl bg-(--rf-ink) px-4 py-2.5 text-sm font-bold text-(--rf-accent)">{t.demos.open}</span>
                     </div>
                   </Link>
                 </li>
@@ -532,11 +364,7 @@ export function Landing({ locale }: { locale: Locale }) {
         </section>
 
         {/* --- Pricing --------------------------------------------------------- */}
-        <section
-          id="pricing"
-          aria-labelledby="pricing-heading"
-          className="scroll-mt-20 bg-(--rf-ink) text-(--rf-paper)"
-        >
+        <section id="pricing" aria-labelledby="pricing-heading" className="scroll-mt-20 bg-(--rf-ink) text-(--rf-paper)">
           <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
             <h2 id="pricing-heading" className={sectionTitle}>
               {t.pricing.title}
@@ -544,26 +372,16 @@ export function Landing({ locale }: { locale: Locale }) {
             <div className="mt-12 grid gap-6 md:grid-cols-[1fr_1fr_1.1fr]">
               <div className="rounded-2xl border border-(--rf-dark-line) bg-(--rf-panel) p-7">
                 <h3 className="text-sm font-bold text-(--rf-accent)">{t.pricing.setup}</h3>
-                <p className="rf-serif mt-3 text-6xl tabular-nums">
-                  {formatPrice(SITE.pricing.setupUsd)}
-                </p>
-                <p className="mt-4 leading-relaxed text-(--rf-dark-muted)">
-                  {t.pricing.setupBody(SITE.pricing.dishesIncluded)}
-                </p>
+                <p className="rf-serif mt-3 text-6xl tabular-nums">{formatPrice(SITE.pricing.setupUsd)}</p>
+                <p className="mt-4 leading-relaxed text-(--rf-dark-muted)">{t.pricing.setupBody(SITE.pricing.dishesIncluded)}</p>
               </div>
               <div className="rounded-2xl border border-(--rf-dark-line) bg-(--rf-panel) p-7">
                 <h3 className="text-sm font-bold text-(--rf-accent)">{t.pricing.monthlyLabel}</h3>
                 <p className="mt-3">
-                  <span className="rf-serif text-6xl tabular-nums">
-                    {formatPrice(SITE.pricing.monthlyUsd)}
-                  </span>
-                  <span className="ml-1.5 text-base font-medium text-(--rf-dark-muted)">
-                    {t.pricing.monthly}
-                  </span>
+                  <span className="rf-serif text-6xl tabular-nums">{formatPrice(SITE.pricing.monthlyUsd)}</span>
+                  <span className="ml-1.5 text-base font-medium text-(--rf-dark-muted)">{t.pricing.monthly}</span>
                 </p>
-                <p className="mt-4 leading-relaxed text-(--rf-dark-muted)">
-                  {t.pricing.monthlyBody}
-                </p>
+                <p className="mt-4 leading-relaxed text-(--rf-dark-muted)">{t.pricing.monthlyBody}</p>
               </div>
               <div className="flex flex-col justify-between rounded-2xl bg-(--rf-paper) p-7 text-(--rf-ink)">
                 <div>
@@ -588,10 +406,7 @@ export function Landing({ locale }: { locale: Locale }) {
         </section>
 
         {/* --- FAQ ---------------------------------------------------------------- */}
-        <section
-          aria-labelledby="faq-heading"
-          className="mx-auto max-w-3xl px-4 py-24 sm:px-6"
-        >
+        <section aria-labelledby="faq-heading" className="mx-auto max-w-3xl px-4 py-24 sm:px-6">
           <h2 id="faq-heading" className={sectionTitle}>
             {t.faq.title}
           </h2>
@@ -618,16 +433,15 @@ export function Landing({ locale }: { locale: Locale }) {
 
         {/* --- Final call to action ------------------------------------------------ */}
         <section className="bg-(--rf-ink) text-(--rf-paper)">
-          <div className="mx-auto max-w-6xl px-4 py-24 text-center sm:px-6">
-            <h2 className="rf-serif text-5xl leading-[1.02] sm:text-7xl">
-              {t.final.title}
-            </h2>
-            <p className="mx-auto mt-5 max-w-lg text-lg text-(--rf-dark-muted)">
-              {t.final.body}
-            </p>
+          <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-24 text-center sm:px-6">
+            <h2 className="rf-serif text-5xl leading-[1.02] sm:text-7xl">{t.final.title}</h2>
+            <p className="mx-auto mt-5 max-w-lg text-lg text-(--rf-dark-muted)">{t.final.body}</p>
             <Link href={demoHref} className={`${btnPrimary} mt-8`}>
               {t.final.cta}
             </Link>
+            <div className="mt-10 hidden text-left md:block">
+              <TryQr svg={tryQr} title={t.final.qr} />
+            </div>
           </div>
         </section>
       </main>
