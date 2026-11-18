@@ -10,9 +10,14 @@
 //                    flat, so its shortest side is the height.
 //   --flip           The dish came out upside down.
 //   --max-tris <n>   Triangle budget (default 150000).
-//   --texture <px>   Max texture size (default 2048).
+//   --texture <px>   Max texture size (default 4096). Smaller textures keep their
+//                    original bytes (no re-compression).
 //   --no-enhance     Keep the scan's raw colors (default: white balance from the
 //                    plate, gentle contrast and +4% saturation).
+//   --unlit          Show the food exactly as photographed (KHR_materials_unlit):
+//                    a scan already has the real light baked into its texture, so
+//                    virtual lights on top make it look like a cartoon. The plate
+//                    (material "ceramic") stays lit. Use with --no-enhance.
 //
 // What it does
 //   1. Levels the model and sets the plate's widest point to exactly --plate cm
@@ -28,11 +33,12 @@ import { mkdir, stat } from "node:fs/promises";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { getBounds } from "@gltf-transform/core";
-import { dedup, draco, flatten, join, prune, simplify, textureCompress, weld } from "@gltf-transform/functions";
+import { dedup, draco, flatten, join, prune, simplify, weld } from "@gltf-transform/functions";
+import { KHRMaterialsUnlit } from "@gltf-transform/extensions";
 import { MeshoptSimplifier } from "meshoptimizer";
 import sharp from "sharp";
 import { createIO } from "./demo/export.mjs";
-import { enhanceTextures } from "./demo/scan-cleanup.mjs";
+import { addFoodRoughness, enhanceTextures } from "./demo/scan-cleanup.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const { values, positionals } = parseArgs({
@@ -43,7 +49,8 @@ const { values, positionals } = parseArgs({
     up: { type: "string", default: "auto" },
     flip: { type: "boolean", default: false },
     "max-tris": { type: "string", default: "150000" },
-    texture: { type: "string", default: "2048" },
+    texture: { type: "string", default: "4096" },
+    unlit: { type: "boolean", default: false },
     "no-enhance": { type: "boolean", default: false },
   },
 });
@@ -118,10 +125,30 @@ if (tris > maxTris) {
 }
 if (!values["no-enhance"]) {
   for (const note of await enhanceTextures(doc)) console.log(`Color: ${note}`);
+  for (const note of await addFoodRoughness(doc)) console.log(`Finish: ${note}`);
 }
+if (values.unlit) {
+  const unlit = doc.createExtension(KHRMaterialsUnlit);
+  for (const material of doc.getRoot().listMaterials()) {
+    if (material.getName() === "ceramic") continue;
+    material.setExtension("KHR_materials_unlit", unlit.createUnlit());
+    // Unlit ignores normal and roughness maps: drop them so diners don't download them.
+    material.setNormalTexture(null).setMetallicRoughnessTexture(null);
+    console.log(`Unlit: "${material.getName()}" shows its texture as photographed`);
+  }
+}
+// Only textures larger than --texture are resized and re-encoded; the rest keep
+// the scan's original JPEG bytes (every re-encode loses detail).
 const px = Number(values.texture);
+for (const texture of doc.getRoot().listTextures()) {
+  const image = texture.getImage();
+  if (!image) continue;
+  const meta = await sharp(Buffer.from(image)).metadata();
+  if (Math.max(meta.width ?? 0, meta.height ?? 0) <= px && texture.getMimeType() === "image/jpeg") continue;
+  const out = await sharp(Buffer.from(image)).resize(px, px, { fit: "inside", withoutEnlargement: true }).jpeg({ quality: 92, mozjpeg: true }).toBuffer();
+  texture.setImage(new Uint8Array(out)).setMimeType("image/jpeg");
+}
 await doc.transform(
-  textureCompress({ encoder: sharp, targetFormat: "jpeg", resize: [px, px], quality: 85 }),
   prune(),
   draco({ method: "edgebreaker", quantizePosition: 16 }),
 );

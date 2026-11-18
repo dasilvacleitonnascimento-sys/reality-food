@@ -21,6 +21,9 @@ type ModelViewerAttributes = DetailedHTMLProps<
   exposure?: string;
   "touch-action"?: "pan-y" | "pan-x" | "none";
   "shadow-intensity"?: string;
+  "shadow-softness"?: string;
+  "environment-image"?: string;
+  "tone-mapping"?: "auto" | "aces" | "agx" | "neutral" | "commerce" | "linear" | "reinhard" | "cineon";
   loading?: "auto" | "lazy" | "eager";
   reveal?: "auto" | "manual";
 };

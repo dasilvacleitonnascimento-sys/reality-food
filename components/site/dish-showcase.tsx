@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Ruler } from "lucide-react";
 import { PlateRuler } from "@/components/measure/plate-ruler";
+import { VIEWER_LOOK } from "@/lib/ar/viewer-look";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 export type ShowcaseDish = { id: string; name: string; glbUrl: string; sizeLabel: string; plateCm: number };
@@ -103,6 +104,7 @@ export function DishShowcase({ dishes, text }: Props) {
           interaction-prompt="none"
           touch-action="pan-y"
           shadow-intensity="1.2"
+          {...VIEWER_LOOK}
           exposure="1.05"
           loading="eager"
           className="relative block aspect-square h-auto w-full bg-transparent transition-[opacity,transform] ease-out"

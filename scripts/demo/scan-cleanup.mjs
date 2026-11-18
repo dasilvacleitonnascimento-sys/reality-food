@@ -64,7 +64,9 @@ export function removeIslands(doc, { minTriangles = 80, minFraction = 0.002 } = 
  *  - white balance: bright, low-saturation texels (the plate, rice, cream)
  *    are pulled toward neutral white (half strength, so food keeps its warmth);
  *  - contrast: levels stretched between the 0.5% and 99.5% luminance points;
- *  - +4% saturation (subtle: scans already carry the real color).
+ *  - saturation nudged toward natural: scans that came out over-saturated (fries,
+ *    buns under warm light) are toned down, flat ones get +4%;
+ *  - a light sharpen, to win back detail that photo blending softens.
  * Returns a short description of what changed.
  */
 export async function enhanceTextures(doc) {
@@ -81,12 +83,19 @@ export async function enhanceTextures(doc) {
 
     const whites = [0, 0, 0];
     let whiteCount = 0;
+    let satSum = 0;
+    let satCount = 0;
     const lum = [];
     for (let i = 0; i < data.length; i += 3) {
       const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
       const max = Math.max(r, g, b);
       const min = Math.min(r, g, b);
       lum.push(0.2126 * r + 0.7152 * g + 0.0722 * b);
+      // Only colored texels (the food), not the grey cloth or white plate around it.
+      if (max > 40 && (max - min) / max > 0.2) {
+        satSum += (max - min) / max;
+        satCount++;
+      }
       if (max > 170 && max - min < 40) {
         whites[0] += r;
         whites[1] += g;
@@ -107,6 +116,9 @@ export async function enhanceTextures(doc) {
     // Gentle: strong contrast/saturation made buns look orange (burger scan, 16/11).
     const scale = hi > lo ? Math.min(1.08, 245 / (hi - lo)) : 1;
     const offset = -lo * scale + 4;
+    // Average saturation of the food: above ~0.5 reads as "cartoon orange".
+    const avgSat = satCount ? satSum / satCount : 0;
+    const saturation = avgSat > 0.5 ? Math.max(0.86, 1 - (avgSat - 0.5) * 0.7) : 1.04;
 
     const out = await sharp(input)
       .removeAlpha()
@@ -116,11 +128,66 @@ export async function enhanceTextures(doc) {
         [0, 0, gains[2]],
       ])
       .linear(scale, offset)
-      .modulate({ saturation: 1.04 })
+      .modulate({ saturation })
+      .sharpen({ sigma: 0.8, m1: 0.6, m2: 1.2 })
       .jpeg({ quality: 92 })
       .toBuffer();
     texture.setImage(new Uint8Array(out)).setMimeType("image/jpeg");
-    notes.push(`white balance ${gains.map((g) => g.toFixed(2)).join("/")}, contrast x${scale.toFixed(2)}, saturation +4%`);
+    notes.push(`white balance ${gains.map((g) => g.toFixed(2)).join("/")}, contrast x${scale.toFixed(2)}, saturation x${saturation.toFixed(2)} (was ${avgSat.toFixed(2)}), sharpened`);
+  }
+  return notes;
+}
+
+/**
+ * Food is not one material: wet greens, onion and tomato shine, meat is satin,
+ * bread and fries are matte. Builds a roughness map from each scanned texture's
+ * colors (G channel of a metallic-roughness texture) so each part reflects light
+ * the way it should. The plate (material "ceramic") keeps its own finish.
+ */
+export async function addFoodRoughness(doc) {
+  const notes = [];
+  for (const material of doc.getRoot().listMaterials()) {
+    const color = material.getBaseColorTexture();
+    if (!color || material.getName() === "ceramic") continue;
+    const SIZE = 1024;
+    const { data } = await sharp(Buffer.from(color.getImage())).removeAlpha().resize(SIZE, SIZE, { fit: "fill" }).raw().toBuffer({ resolveWithObject: true });
+    const out = Buffer.alloc(SIZE * SIZE * 3);
+    const counts = { wet: 0, meat: 0, matte: 0 };
+    for (let i = 0; i < data.length; i += 3) {
+      const r = data[i] / 255;
+      const g = data[i + 1] / 255;
+      const b = data[i + 2] / 255;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      const sat = max ? (max - min) / max : 0;
+      let hue = 0;
+      if (max !== min) {
+        if (max === r) hue = (60 * ((g - b) / (max - min)) + 360) % 360;
+        else if (max === g) hue = 60 * ((b - r) / (max - min)) + 120;
+        else hue = 60 * ((r - g) / (max - min)) + 240;
+      }
+      let rough = 0.68; // bread, fries, crust
+      const greenOrPurple = (hue > 70 && hue < 170) || (hue > 275 && hue < 345);
+      const red = (hue < 12 || hue > 345) && sat > 0.45 && max > 0.3;
+      if ((greenOrPurple && sat > 0.22) || red) {
+        rough = 0.36; // lettuce, herbs, red onion, tomato: wet
+        counts.wet++;
+      } else if (max < 0.32) {
+        rough = 0.5; // cooked meat, dark sauces: satin
+        counts.meat++;
+      } else if (sat < 0.12 && max > 0.75) {
+        rough = 0.42; // white sauces, cream, mayo
+      } else counts.matte++;
+      out[i] = 255; // occlusion: none
+      out[i + 1] = Math.round(rough * 255);
+      out[i + 2] = 0; // not metal
+    }
+    // Soften the edges between regions so highlights don't sparkle.
+    const jpeg = await sharp(out, { raw: { width: SIZE, height: SIZE, channels: 3 } }).blur(1.2).jpeg({ quality: 85 }).toBuffer();
+    const tex = doc.createTexture(material.getName() + "-roughness").setImage(new Uint8Array(jpeg)).setMimeType("image/jpeg");
+    material.setMetallicRoughnessTexture(tex).setRoughnessFactor(1).setMetallicFactor(0);
+    const total = counts.wet + counts.meat + counts.matte || 1;
+    notes.push("roughness map: " + Math.round((counts.wet / total) * 100) + "% wet, " + Math.round((counts.meat / total) * 100) + "% satin, rest matte");
   }
   return notes;
 }

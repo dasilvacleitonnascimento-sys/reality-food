@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import type { FollowArSession, FollowArStatus } from "@/lib/ar/follow-ar";
 import { isFollowArSupported } from "@/lib/ar/support";
 import type { ViewerText } from "@/lib/i18n/dictionaries";
+import { VIEWER_LOOK } from "@/lib/ar/viewer-look";
 import { ArGuide } from "./ar-guide";
 
 type Props = {
@@ -190,6 +191,7 @@ export function DishViewer({ glbUrl, usdzUrl, poster, alt, text }: Props) {
         camera-controls
         touch-action="pan-y"
         shadow-intensity="1"
+        {...VIEWER_LOOK}
         // h-auto: model-viewer sets height: 150px by default, which would beat aspect-square.
         className="relative block aspect-square h-auto w-full bg-muted"
       >

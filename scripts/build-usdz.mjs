@@ -17,15 +17,22 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { simplify, weld } from "@gltf-transform/functions";
 import { MeshoptSimplifier } from "meshoptimizer";
+import sharp from "sharp";
 import { createIO } from "./demo/export.mjs";
+import { pngTexturesToJpeg } from "./demo/usdz-jpeg.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const filter = process.argv[2] ?? "";
 // USDZ stores geometry as text (no compression), so the AR copy is lighter
-// than the 3D viewer's: ~15k triangles and 1024 px textures keep files around
-// 2-4 MB, which iPhones download and open in a second or two.
-const MAX_TRIS = 15000;
-const MAX_TEXTURE = 1024;
+// than the 3D viewer's: ~15k triangles. Color stays sharp at 2048 px (food is
+// looked at from up close in AR); roughness/occlusion maps are cut to 1024 px,
+// where nobody sees the difference. Textures are re-packed as JPEG
+// (scripts/demo/usdz-jpeg.mjs), so files land around 2-4 MB.
+// Scanned food keeps its full mesh (~35k triangles) so AR shows the real shape;
+// only heavier models are simplified. JPEG textures leave room for it under 5 MB.
+const MAX_TRIS = 50000;
+const MAX_TEXTURE = 2048;
+const MAX_DATA_TEXTURE = 1024;
 const CHROME = [
   "C:/Program Files/Google/Chrome/Application/chrome.exe",
   "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
@@ -65,6 +72,18 @@ for (const m of models) {
   for (const material of doc.getRoot().listMaterials()) material.setNormalTexture(null);
   for (const texture of doc.getRoot().listTextures()) {
     if (!doc.getRoot().listMaterials().some((mat) => [mat.getBaseColorTexture(), mat.getMetallicRoughnessTexture(), mat.getOcclusionTexture(), mat.getEmissiveTexture()].includes(texture))) texture.dispose();
+  }
+  // Roughness/occlusion maps: smaller than color (see MAX_DATA_TEXTURE).
+  for (const texture of doc.getRoot().listTextures()) {
+    const materials = doc.getRoot().listMaterials();
+    const isData = materials.some((mat) => [mat.getMetallicRoughnessTexture(), mat.getOcclusionTexture()].includes(texture));
+    const isColor = materials.some((mat) => mat.getBaseColorTexture() === texture);
+    if (!isData || isColor || !texture.getImage()) continue;
+    const small = await sharp(Buffer.from(texture.getImage()))
+      .resize(MAX_DATA_TEXTURE, MAX_DATA_TEXTURE, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 85 })
+      .toBuffer();
+    texture.setImage(new Uint8Array(small)).setMimeType("image/jpeg");
   }
   let after = 0;
   for (const prim of doc.getRoot().listMeshes().flatMap((mesh) => mesh.listPrimitives())) {
@@ -145,6 +164,23 @@ for (const glb of models) {
     const gltf = await loader.loadAsync("/work/" + glb);
     // Same structure model-viewer exports: the model inside a plain group.
     const group = new THREE.Object3D();
+    // Unlit materials (scanned food, KHR_materials_unlit) come in as MeshBasicMaterial,
+    // which USDZ can't express. Quick Look would light the photo texture again on top
+    // of the light already in it. Instead: no diffuse, the texture as emissive color,
+    // so the dish shows exactly as photographed.
+    gltf.scene.traverse((node) => {
+      if (!node.isMesh || !node.material?.isMeshBasicMaterial) return;
+      const basic = node.material;
+      node.material = new THREE.MeshStandardMaterial({
+        color: 0x000000,
+        emissive: 0xffffff,
+        emissiveMap: basic.map,
+        roughness: 1,
+        metalness: 0,
+        side: basic.side,
+      });
+      basic.dispose();
+    });
     group.add(gltf.scene);
     group.updateWorldMatrix(false, true);
     addRuler(group, gltf.scene);
@@ -178,7 +214,8 @@ const server = createServer(async (req, res) => {
       const target = path.resolve(root, "public", rel);
       // Only ever write .usdz files inside public/models.
       if (!target.startsWith(path.join(root, "public", "models") + path.sep) || !target.endsWith(".usdz")) throw new Error(`bad path ${rel}`);
-      const data = await body();
+      // three.js writes PNG textures; JPEG is 3-4x lighter and Quick Look reads it.
+      const data = await pngTexturesToJpeg(await body());
       await writeFile(target, data);
       results.saved.push([rel, data.length]);
       console.log(`  ${rel}  ${(data.length / 1024 / 1024).toFixed(2)} MB`);
