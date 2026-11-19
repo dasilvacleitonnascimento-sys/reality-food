@@ -81,7 +81,14 @@ Best: the user's real photo (45°, natural light, whole plate), cropped to
 `<prefix>-34.jpg`, and tell the user a real photo would look better.
 
 ### 4. Add the dish to the data
-`lib/demo-data.ts` (Demo Bistro) or `lib/demo-ironside.ts`: id, name,
+**Real restaurants (created in the admin panel at /admin):** the dish already
+exists there with name, price, photo and category. Skip this step and step 7's
+publish-dish; instead attach the model with
+`npm run publish-model -- <restaurant-slug> <dish-slug> public/models/<restaurant>/<dish-id>.glb --plate <cm>`
+(uploads the .glb and the .usdz next to it under versioned names, changes only
+the model fields). The admin dish page then shows the 3D preview.
+
+**Demo menus only:** `lib/demo-data.ts` (Demo Bistro) or `lib/demo-ironside.ts`: id, name,
 description, price, category, photo, `glbUrl: "/models/<restaurant>/<dish-id>.glb"`,
 `plateDiameterCm`, tags (e.g. "Real scan"), `servedIn` for cups/bowls, and the
 Spanish name/description under `translations.es.dishes`.
