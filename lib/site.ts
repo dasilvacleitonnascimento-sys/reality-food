@@ -14,7 +14,7 @@ export const SITE = {
   salesEmail: "",
   pricing: {
     setupUsd: 600,
-    monthlyUsd: 99,
+    monthlyUsd: 52.9,
     /** Dishes we scan in 3D as part of setup. */
     dishesIncluded: 15,
   },

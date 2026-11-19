@@ -1,12 +1,9 @@
-const usd = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
-});
+const whole = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const cents = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+/** $18 for whole dollars, $52.90 (never $52.9) otherwise. */
 export function formatPrice(dollars: number): string {
-  return usd.format(dollars);
+  return Number.isInteger(dollars) ? whole.format(dollars) : cents.format(dollars);
 }
 
 /** e.g. 27 -> "27 cm (10.6 in)" */
